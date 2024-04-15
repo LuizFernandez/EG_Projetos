@@ -1,0 +1,66 @@
+// Regras Sintáticas
+start: statments*
+
+statments: declaration
+         | attribution
+
+declaration: type ID ( | "=" value)
+
+attribution: ID "=" value
+
+type: primitive_type
+	| complex_type
+
+primitive_type: PRIMITIVE_TYPES
+
+complex_type  : COMPLEX_TYPE
+
+value: ID                  -> value_id
+     | primitive_value
+     | complex_value
+
+primitive_value : INT      -> value_int
+				| FLOAT    -> value_float
+				| STRING   -> value_string
+				| BOOL     -> value_bool
+
+complex_value : list_construct
+			  | set_construct
+			  | tuple_construct
+			  | array_construct
+
+list_construct : LRPAR RRPAR
+			   | LRPAR value ("," value)* RRPAR
+			   | "list(" ID ")" # ID apenas pode ser do tipo arrary ou set                                      mas tem que ser uma variável
+
+set_construct : "set()"
+			  | "set(" ID ")"
+			  
+tuple_construct : LPAR RPAR
+				| LPAR value "," value RPAR
+
+array_construct : "array(" INT ")"
+				| "array(" ID ")" # ID é uma vairável do tipo lista, set ou tuple
+
+                
+// Regras Lexicográficas
+
+ID:/(?!int|float|bool|string|set|list|array|tuple|True|False\b)[_aA-zZ][aA-zZ_\d]*/
+
+INT: /(-)?\d+/
+FLOAT: /(-)?\d+\.\d*/
+STRING: /"[^"]*"/
+BOOL: "True"|"False"
+
+RRPAR: "]"
+LRPAR: "["
+LPAR: "("
+RPAR: ")"
+
+PRIMITIVE_TYPES: /int|float|bool|string/
+COMPLEX_TYPE: /set|list|tuple|array/
+
+
+// Tratamento dos espaços em branco
+%import common.WS
+%ignore WS

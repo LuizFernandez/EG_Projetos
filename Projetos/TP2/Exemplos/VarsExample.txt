@@ -1,0 +1,32 @@
+int a = 10
+float b = -3.9
+bool c = True
+string s = "Hello"
+
+e = 1
+
+float a = 2.4
+
+float t = b
+
+a = p
+
+string l
+l = "World"
+
+list z = [2,3,4,5,2,a,3]
+
+set conj = set(z)
+set conj2 = set()
+list temp = list(conj)
+
+
+tuple tp = ()
+
+tuple tp2 = (z, conj)
+
+list lr = list(buy)
+
+array r = array(3)
+array r2 = array(a)
+array r3 = array(conj)
