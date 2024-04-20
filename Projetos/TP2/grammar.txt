@@ -3,8 +3,10 @@ start: statments*
 
 statments: declaration
          | attribution
+		 | selection
+		 | cycle
 
-declaration: type ID ( | "=" value)
+declaration: type ID ( | "=" value )
 
 attribution: ID "=" value
 
@@ -42,6 +44,12 @@ tuple_construct : LPAR RPAR
 array_construct : "array(" INT ")"
 				| "array(" ID ")" # ID é uma vairável do tipo lista, set ou tuple
 
+selection : IF "(" value ")" "{" statments* ( "break" | "return" value )? "}"
+		  | IF "(" value ")" "{" statments* "}" "else" ( "{" statments* "}" | selection )
+
+cycle : WHILE "(" value ")" "{" statments* "}"
+	  | DO "{" statments* "}" "while" "(" value ")"
+	  | FOR ID "in" ( value ) "{" statments* "}"
                 
 // Regras Lexicográficas
 
@@ -51,6 +59,10 @@ INT: /(-)?\d+/
 FLOAT: /(-)?\d+\.\d*/
 STRING: /"[^"]*"/
 BOOL: "True"|"False"
+IF : "if"
+WHILE : "while"
+DO : "do"
+FOR : "for"
 
 RRPAR: "]"
 LRPAR: "["

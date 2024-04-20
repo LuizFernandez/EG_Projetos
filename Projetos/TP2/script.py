@@ -1,3 +1,5 @@
+from lark import Token
+
 def get_type(value):
 
     type = None
@@ -78,4 +80,13 @@ def validate_error(errors, error_type, args):
                 "description": f"Function {function_name} does not accept variable {variable} of type {var_type}, because of being of a different type",
                 "variable": variable
             })
+
+def count_Control(tokens):
+    count = 0
+    for token in tokens:
+        if isinstance(token, Token) and (token.type == 'IF' or token.type == 'WHILE' or token.type == 'DO' or token.type == 'FOR'):
+            count += 1
+        elif isinstance(token, list):
+            count += count_Control(token)
+    return count
 

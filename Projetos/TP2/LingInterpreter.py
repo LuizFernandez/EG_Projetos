@@ -1,16 +1,20 @@
 from lark.visitors import Interpreter
 
-from script import get_type, validate_error
+from script import get_type, validate_error, count_Control
 
 class MyInterpreter(Interpreter):
     def __init__(self):
         self.vars = {}
         self.erros = []
+        self.types = {}
+        self.count= {"attributions" : 0, "declarations" : 0, "selections" : 0, "cycles" : 0}
+        self.nesting = 0
+        self.last_nesting = 0
 
     def start(self, tree):
         for statement in tree.children:
             self.visit(statement)
-        return (self.vars, self.erros)
+        return (self.vars, self.erros, self.types, self.count, self.nesting - 1)
     
     def statment(self, tree):
         r =  self.visit_children(tree)
@@ -18,6 +22,7 @@ class MyInterpreter(Interpreter):
         pass
 
     def declaration(self, tree):
+        self.count["declarations"] += 1
         r = self.visit_children(tree)
         var_type = str(r[0])
         variable = str(r[1])
@@ -43,6 +48,9 @@ class MyInterpreter(Interpreter):
             self.vars[variable]["value"] = value
             self.vars[variable]["used"] = False
             self.vars[variable]["init"] = flag_init
+            if var_type not in self.types.keys():
+                self.types[var_type] = []
+            self.types[var_type].append(variable)
         else:
             if variable in self.vars.keys():
                 validate_error(self.erros, "redeclaration", (variable))
@@ -52,6 +60,7 @@ class MyInterpreter(Interpreter):
                 validate_error(self.erros, "failedD", (variable, var_type, value_name))
 
     def attribution(self, tree):
+        self.count["attributions"] += 1
         r = self.visit_children(tree)
         variable = str(r[0])
         (value, var_name, flag_val) = self.visit(tree.children[1])
@@ -214,3 +223,46 @@ class MyInterpreter(Interpreter):
 
     def value_operation(self, tree):
         print("Value Operation")
+    
+    def selection(self, tree):
+        self.count["selections"] += 1
+        r = self.visit_children(tree)
+        self.nesting += 1
+        token_list = []
+        print("New")
+        for elem in r:
+            if isinstance(elem, list):
+                token_list.append(elem)
+        print("Token_list:", token_list)
+        count = count_Control(token_list)
+        print("Count:", count)
+        print("Last Nesting:", self.last_nesting)
+
+        if count < self.last_nesting:
+            print("HELLO")
+            self.nesting -= 1
+
+        self.last_nesting = count
+
+        return r
+
+    def cycle(self, tree):
+        self.count["selections"] += 1
+        r = self.visit_children(tree)
+        self.nesting += 1
+        token_list = []
+        print("New")
+        for elem in r:
+            if isinstance(elem, list):
+                token_list.append(elem)
+        count = count_Control(token_list)
+        print("Count:", count)
+        print("Last Nesting:", self.last_nesting)
+
+        if count < self.last_nesting:
+            print("HELLO")
+            self.nesting -= 1
+
+        self.last_nesting = count
+
+        return r

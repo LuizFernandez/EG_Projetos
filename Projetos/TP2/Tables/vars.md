@@ -7,3 +7,4 @@
 |ar|array|[1, 2, 3]|False|
 |l2|list|[1, 2, 3, 4, 4, 4, 5, 2]|True|
 |s|set|{1, 2, 3, 4, 5}|True|
+|z|int|10|True|

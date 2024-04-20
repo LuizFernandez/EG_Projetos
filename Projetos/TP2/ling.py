@@ -23,6 +23,32 @@ def error_table_output(errors):
 
     file.close()
 
+def type_table_output(types):
+    file = open("./Tables/types.md", "w")
+
+    # Total de varíaveis declaradas por cada Tipo de dados usados
+    file.write("| Type | Vars | Number |\n")
+    file.write("|------|------|--------|\n")
+    for type, vars in types.items():
+        str_vars = ""
+        for v in vars:
+            str_vars += f"{v}, "
+        str_vars = str_vars[:-2]
+        file.write(f"{type}|{str_vars}|{len(vars)}\n")
+
+    file.close()
+
+def count_table_output(count):
+    file = open("./Tables/count.md", "w")
+
+    # otal de instruções que formam o corpo do program
+    file.write("| Type | Number |\n")
+    file.write("|------|--------|\n")
+    for type, number in count.items():
+        file.write(f"{type}|{number}\n")
+
+    file.close()
+
 
 with open("grammar.txt","r") as file:
     grammar = file.read()
@@ -33,7 +59,10 @@ with open("./Exemplos/VarsExample.txt") as file:
 p = Lark(grammar) # cria um objeto parser
 
 tree = p.parse(exemple)  # retorna uma tree
-(data, erros) = MyInterpreter().visit(tree)
+(data, erros, types, count, nesting) = MyInterpreter().visit(tree)
 
 var_table_output(data)
 error_table_output(erros)
+count_table_output(count)
+type_table_output(types)
+print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)

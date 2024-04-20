@@ -23,3 +23,22 @@ set s = set(l2)
 list l3 = list(a)
 
 l = list(s)
+
+int z = 10
+
+if(z){
+    
+    if(z){
+        if(z){
+        
+        }
+    }
+    if(z){
+        
+    }
+}
+
+
+
+
+
