@@ -36,6 +36,13 @@ def validate_error(errors, error_type, args):
                 "description": "variable is already declare", 
                 "variable": variable
             })
+        case "notDeclared":
+            variable = args[0]
+            errors.append({
+                "type": "Not Declared", 
+                "description": "Variable is not declared", 
+                "variable": variable
+            })
         case "typing":
             (var_type, variable, value) = args
             errors.append({
@@ -50,17 +57,25 @@ def validate_error(errors, error_type, args):
                 "description": f"Variable {value} isn't declared for use",
                 "variable": value
             })
-        case "failed":
+        case "failedD":
             (variable, var_type, value) = args
             errors.append({
                 "type": "Failed to Declare", 
                 "description": f"Variable {variable} of type {var_type} failed to be declared because variable {value} doesn't exist!", 
                 "variable": variable
             })
-        case "faildArgC":
-            (variable, var_type, const) = args
+        case "failedA":
+            (variable, var_type, value) = args
             errors.append({
-                "type": "Invalid Argument Type", 
-                "description": f"Variable {variable} of type {var_type} is not of a type that the construct {const} accepts", 
+                "type": "Failed to Assign", 
+                "description": f"Variable {variable} of type {var_type} failed to recive a new value", 
                 "variable": variable
             })
+        case "faildArgC":
+            (variable, var_type, function_name) = args
+            errors.append({
+                "type": "Invalid Argument Type", 
+                "description": f"Function {function_name} does not accept variable {variable} of type {var_type}, because of being of a different type",
+                "variable": variable
+            })
+

@@ -1,32 +1,25 @@
 int a = 10
-float b = -3.9
-bool c = True
-string s = "Hello"
 
-e = 1
+float a = 3.2
 
-float a = 2.4
+string b = 2
 
-float t = b
+string b = "Hello World"
 
-a = p
+int f = a
 
-string l
-l = "World"
+bool d = p
 
-list z = [2,3,4,5,2,a,3]
+float c = f
 
-set conj = set(z)
-set conj2 = set()
-list temp = list(conj)
+list l = [1,2,3]
 
+array ar = array(l)
 
-tuple tp = ()
+list l2 = [1,2,3,4,4,4,5,2]
 
-tuple tp2 = (z, conj)
+set s = set(l2)
 
-list lr = list(buy)
+list l3 = list(a)
 
-array r = array(3)
-array r2 = array(a)
-array r3 = array(conj)
+l = list(s)

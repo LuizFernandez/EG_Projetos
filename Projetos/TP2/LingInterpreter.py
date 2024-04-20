@@ -49,16 +49,28 @@ class MyInterpreter(Interpreter):
             if not flag_type:
                 validate_error(self.erros, "typing", (var_type, variable, value))
             if not flag_val:
-                validate_error(self.erros, "failed", (variable, var_type, value_name))
+                validate_error(self.erros, "failedD", (variable, var_type, value_name))
 
     def attribution(self, tree):
         r = self.visit_children(tree)
         variable = str(r[0])
-        value = self.visit(tree.children[1]) 
-        if variable in self.vars.keys():
+        (value, var_name, flag_val) = self.visit(tree.children[1])
+        flag_type = True
+
+        if flag_val and get_type(self.vars[variable]["type"]) is not type(value):
+                flag_type = False
+                if var_name != None:
+                    self.vars[var_name]["used"] = False
+
+        if variable in self.vars.keys() and flag_type and flag_val:
             self.vars[variable]["value"] = value
         else:
-            self.erros.append({"type": "variable not declared", "error": f"{variable} = {value}"})
+            if variable not in self.vars.keys():
+                validate_error(self.erros, "notDeclared", (variable))
+            if not flag_type:
+                validate_error(self.erros, "typing", (self.vars[variable]["type"], variable, value))
+            if not flag_val:
+                validate_error(self.erros, "failedA", (variable, self.vars[variable]["type"], var_name))
 
         return self.vars
     
@@ -132,8 +144,12 @@ class MyInterpreter(Interpreter):
                 value = list(self.vars[variable]["value"])
                 self.vars[variable]["used"] = True
             else:
+                if variable not in self.vars.keys():
+                    validate_error(self.erros, "missing", (variable))
+                else:
+                    validate_error(self.erros, "faildArgC", (variable, self.vars[variable]["type"], "list()"))
                 flag = False
-                validate_error(self.erros, "faildArgC", (variable, self.vars[variable]["type"], "list"))
+                
 
         return (value, variable, flag)
             
@@ -150,8 +166,11 @@ class MyInterpreter(Interpreter):
                 value = set(self.vars[variable]["value"])
                 self.vars[variable]["used"] = True
             else:
+                if variable not in self.vars.keys():
+                    validate_error(self.erros, "missing", (variable))
+                else:
+                    validate_error(self.erros, "faildArgC", (variable, self.vars[variable]["type"], "set()"))
                 flag = False
-                validate_error(self.erros, "faildArgC", (variable, self.vars[variable]["type"], "set"))
         else:
             value = set()
 
@@ -175,23 +194,23 @@ class MyInterpreter(Interpreter):
         r = self.visit_children(tree)
 
         value = None
-        variable = None
         flag = True
 
-        arg = str(r[0])
-        if arg.isdigit():
-            value = [None] * int(arg)
-        elif arg in self.vars.keys():
-            if self.vars[arg]["type"] == "int":
-                value = [None] * int(self.vars[arg]["value"])
-            elif self.vars[arg]["type"] == "list" or self.vars[arg]["type"] == "set":
-                value = list(self.vars[arg]["value"])
+        variable = str(r[0])
+        if variable.isdigit():
+            value = [None] * int(variable)
+        elif variable in self.vars.keys():
+            if self.vars[variable]["type"] == "int":
+                value = [None] * int(self.vars[variable]["value"])
+            elif self.vars[variable]["type"] == "list" or self.vars[variable]["type"] == "set":
+                value = list(self.vars[variable]["value"])
             else:
-                validate_error(self.erros, "faildArgC", (variable, self.vars[arg]["type"], "array"))
+                validate_error(self.erros, "faildArgC", (variable, self.vars[variable]["type"], "array()"))
         else:
+            validate_error(self.erros, "missing", (variable))
             flag = False
 
-        return (value, arg, flag)
+        return (value, variable, flag)
 
     def value_operation(self, tree):
         print("Value Operation")
