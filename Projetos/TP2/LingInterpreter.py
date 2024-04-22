@@ -230,11 +230,11 @@ class MyInterpreter(Interpreter):
         print("New")
         if len(r) >= 3: 
             for child in r[2:]:
+                print(child)
                 self.nesting += 1
-            if len(r[2:]) == 1:
-                if r[2][0][0] == "if":
-                    self.sub_ifs.append((r[1][1],r[2][0][1]))
-        return ("if",r[1][1])
+            if len(r[2:]) == 1 and r[2][0][0] == "if":
+                self.sub_ifs.append((r[1][1],r[2][0][1]))
+        return ("if", r[1][1])
 
     def cycle(self, tree):
         self.count["selections"] += 1
@@ -242,6 +242,7 @@ class MyInterpreter(Interpreter):
         print("New")
         if len(r) >= 3: 
             for child in r[2:]:
+                print(child)
                 self.nesting += 1
 
         return r
