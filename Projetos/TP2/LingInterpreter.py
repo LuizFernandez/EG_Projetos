@@ -9,12 +9,12 @@ class MyInterpreter(Interpreter):
         self.types = {}
         self.count= {"attributions" : 0, "declarations" : 0, "selections" : 0, "cycles" : 0}
         self.nesting = 0
-        self.last_nesting = 0
+        self.sub_ifs = []
 
     def start(self, tree):
         for statement in tree.children:
             self.visit(statement)
-        return (self.vars, self.erros, self.types, self.count, self.nesting - 1)
+        return (self.vars, self.erros, self.types, self.count, self.nesting, self.sub_ifs)
     
     def statment(self, tree):
         r =  self.visit_children(tree)
@@ -227,42 +227,20 @@ class MyInterpreter(Interpreter):
     def selection(self, tree):
         self.count["selections"] += 1
         r = self.visit_children(tree)
-        self.nesting += 1
-        token_list = []
         print("New")
-        for elem in r:
-            if isinstance(elem, list):
-                token_list.append(elem)
-        print("Token_list:", token_list)
-        count = count_Control(token_list)
-        print("Count:", count)
-        print("Last Nesting:", self.last_nesting)
-
-        if count < self.last_nesting:
-            print("HELLO")
-            self.nesting -= 1
-
-        self.last_nesting = count
-
-        return r
+        if len(r) >= 3: 
+            for child in r[2:]:
+                self.nesting += 1
+            if len(r[2:]) == 1:
+                self.sub_ifs.append((r[1][1],r[2][0]))
+        return r[1][1]
 
     def cycle(self, tree):
         self.count["selections"] += 1
         r = self.visit_children(tree)
-        self.nesting += 1
-        token_list = []
         print("New")
-        for elem in r:
-            if isinstance(elem, list):
-                token_list.append(elem)
-        count = count_Control(token_list)
-        print("Count:", count)
-        print("Last Nesting:", self.last_nesting)
-
-        if count < self.last_nesting:
-            print("HELLO")
-            self.nesting -= 1
-
-        self.last_nesting = count
+        if len(r) >= 3: 
+            for child in r[2:]:
+                self.nesting += 1
 
         return r

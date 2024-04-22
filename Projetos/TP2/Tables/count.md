@@ -2,5 +2,5 @@
 |------|--------|
 attributions|1
 declarations|13
-selections|3
+selections|6
 cycles|0

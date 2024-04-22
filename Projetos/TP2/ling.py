@@ -59,10 +59,11 @@ with open("./Exemplos/VarsExample.txt") as file:
 p = Lark(grammar) # cria um objeto parser
 
 tree = p.parse(exemple)  # retorna uma tree
-(data, erros, types, count, nesting) = MyInterpreter().visit(tree)
+(data, erros, types, count, nesting, sub_ifs) = MyInterpreter().visit(tree)
 
 var_table_output(data)
 error_table_output(erros)
 count_table_output(count)
 type_table_output(types)
 print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
+print("Lista de ifs aninhados que podem ser substituídos por um só if", sub_ifs)

@@ -26,16 +26,21 @@ l = list(s)
 
 int z = 10
 
-if(z){
-    
-    if(z){
-        if(z){
-        
-        }
+if(a){
+    if(b){
+       
     }
-    if(z){
+    if(c){
+       if(d){
         
+        } 
     }
+}
+
+if(e){
+   if(f){
+        
+   }     
 }
 
 
