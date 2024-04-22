@@ -20,6 +20,7 @@ complex_type  : COMPLEX_TYPE
 value: ID                  -> value_id
      | primitive_value
      | complex_value
+	 | operation
 
 primitive_value : INT      -> value_int
 				| FLOAT    -> value_float
@@ -50,6 +51,39 @@ selection : IF "(" value ")" "{" statments* ( "break" | "return" value )? "}"
 cycle : WHILE "(" value ")" "{" statments* "}"
 	  | DO "{" statments* "}" "while" "(" value ")"
 	  | FOR ID "in" ( value ) "{" statments* "}"
+
+operation: expr
+         | expr opr expr
+
+opr : EQ
+    | NE
+    | LT
+    | LE
+    | GT
+    | GE
+
+expr : term
+     | expr opa term
+
+term : factor
+     | term opm factor
+
+opa : ADD 
+	| SUB 
+	| OR
+
+opm : MUL 
+	| DIV 
+	| AND
+	| MOD
+
+factor : INT                     -> value_int
+       | FLOAT                   -> value_float
+       | STRING                  -> value_string
+       | BOOL                    -> value_bool
+	   | ID                      -> value_id
+       | LPAR operation RPAR     -> factor_par
+       | operation POT operation -> factor_pot
                 
 // Regras Lexicográficas
 
@@ -71,6 +105,24 @@ RPAR: ")"
 
 PRIMITIVE_TYPES: /int|float|bool|string/
 COMPLEX_TYPE: /set|list|tuple|array/
+
+EQ: "=="
+NE: "!="
+LT: "<"
+LE: "<="
+GT: ">"
+GE: ">="
+
+ADD: "+"
+SUB: "-"
+OR: "||"
+
+MUL: "*"
+DIV: "/"
+AND: "&&"
+MOD: "%"
+
+POT: "^"
 
 
 // Tratamento dos espaços em branco

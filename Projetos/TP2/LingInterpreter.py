@@ -221,8 +221,117 @@ class MyInterpreter(Interpreter):
 
         return (value, variable, flag)
 
-    def value_operation(self, tree):
-        print("Value Operation")
+    def operation(self, tree):
+        r = self.visit_children(tree)
+        if len(r) > 1:
+            match (r[1]):
+                case "==":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] == r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "!=":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] != r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case ">":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] > r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case ">=":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] >= r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "<":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] < r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "<=":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] <= r[2][0], None, True)
+                case _:
+                    print("Invalid Opereator")
+        return r[0]
+    
+    def opr(self, tree):
+        r = self.visit_children(tree)
+        return(str(r[0]))
+    
+    def expr(self, tree):
+        r = self.visit_children(tree)
+        if (len(r) > 1):
+            match r[1]:
+                case "||":
+                    if type(r[0][0]) is bool and type(r[2][0]) is bool:
+                        return (r[0][0] or r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "-":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] - r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "+":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] + r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case _:
+                    print("Invalid Opereator")
+        else:
+            return r[0]
+
+    def opa(self, tree):
+        r = self.visit_children(tree)
+        return (str(r[0]))
+    
+    def term(self, tree):
+        r = self.visit_children(tree)
+        if (len(r) > 1):
+            match r[1]:
+                case "&&":
+                    if type(r[0][0]) is bool and type(r[2][0]) is bool:
+                        return (r[0][0] and r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "*":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] * r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "/":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] / r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case "%":
+                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
+                        return (r[0][0] % r[2][0], None, True)
+                    else:
+                        return (None, None, False)
+                case _:
+                    print("Invalid Opereator")
+
+        return r[0]
+
+    def opm(self, tree):
+        r = self.visit_children(tree)
+        return (str(r[0]))
+    
+    def factor_par(self,tree):
+        r = self.visit_children(tree)
+        return r[1]
+    
+    def factor_pot(self, tree):
+        r = self.visit_children(tree)
+        if type(r[0][0]) is (bool or str) or type(r[2][0]) is (bool or str):
+            return (None, None, False)
+        else:
+            return (r[0][0] ** r[2][0], None, True)
     
     def selection(self, tree):
         self.count["selections"] += 1
