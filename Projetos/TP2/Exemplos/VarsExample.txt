@@ -28,13 +28,18 @@ int z = 10
 
 if(a){
     if(b){
-       
+       while(True){
+            if(c){
+                if(d){
+                    
+                }
+            }
+       }
     }
-    if(c){
-       if(d){
+    while(True){
         
-        } 
     }
+    
 }
 
 if(e){
