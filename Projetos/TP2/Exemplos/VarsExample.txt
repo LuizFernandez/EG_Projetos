@@ -27,13 +27,15 @@ l = list(s)
 int z = 10
 
 if(a){
+    list a_list = [1,2,3]
     if(b){
        while(True){
             if(c){
                 if(d){
-                    
+                   list b_list = [1,2,3] 
                 }
             }
+            list c_list = [1,2,3] 
        }
     }
     while(True){
@@ -43,7 +45,7 @@ if(a){
 
 if(e){
    if(f){
-        
+        list c_list = [1,2,3] 
    }     
 }
 

@@ -254,7 +254,7 @@ class MyInterpreter(Interpreter):
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
                         return (r[0][0] <= r[2][0], None, True)
                 case _:
-                    print("Invalid Opereator")
+                    print("Invalid Operator")
         return r[0]
     
     def opr(self, tree):
@@ -336,22 +336,23 @@ class MyInterpreter(Interpreter):
     def selection(self, tree):
         self.count["selections"] += 1
         r = self.visit_children(tree)
-        print("New")
+        if_list = []
         if len(r) >= 3: 
             for child in r[2:]:
-                print(child)
-                self.nesting += 1
-            if len(r[2:]) == 1 and r[2][0][0] == "if":
-                self.sub_ifs.append((r[1][1],r[2][0][1]))
-        return ("if", r[1][1])
+                if isinstance(child[0], tuple):
+                    self.nesting += 1
+            if isinstance(r[2][0], tuple):
+                if len(r[2:]) == 1 and r[2][0][0] == "if":
+                    if_list = r[2][0][2]
+                    self.sub_ifs.append([r[1][1]] + if_list)
+        return ("if", r[1][1], [r[1][1]] + if_list)
 
     def cycle(self, tree):
         self.count["selections"] += 1
         r = self.visit_children(tree)
-        print("New")
         if len(r) >= 3: 
             for child in r[2:]:
-                print(child)
-                self.nesting += 1
+                if isinstance(child[0], tuple):
+                    self.nesting += 1
 
-        return r
+        return ("cycle", r[1][1])

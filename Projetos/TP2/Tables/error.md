@@ -1,6 +1,6 @@
 | Variable | Type | Description |
 |----------|------|-------------|
-a|Redeclaration|variable is already declare
+a|Redeclaration|variable is already declared
 b|Type|Value type (2 => <class 'int'>)  doesn't match variable type (string)
 p|Missing|Variable p isn't declared for use
 d|Failed to Declare|Variable d of type bool failed to be declared because variable p doesn't exist!
@@ -10,3 +10,4 @@ l3|Failed to Declare|Variable l3 of type list failed to be declared because vari
 c|Missing|Variable c isn't declared for use
 d|Missing|Variable d isn't declared for use
 e|Missing|Variable e isn't declared for use
+c|Redeclaration|variable is already declared

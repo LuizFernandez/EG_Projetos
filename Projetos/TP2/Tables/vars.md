@@ -8,3 +8,6 @@
 |l2|list|[1, 2, 3, 4, 4, 4, 5, 2]|True|
 |s|set|{1, 2, 3, 4, 5}|True|
 |z|int|10|False|
+|a_list|list|[1, 2, 3]|False|
+|b_list|list|[1, 2, 3]|False|
+|c_list|list|[1, 2, 3]|False|

@@ -35,7 +35,7 @@ def validate_error(errors, error_type, args):
             variable = args[0]
             errors.append({
                 "type": "Redeclaration", 
-                "description": "variable is already declare", 
+                "description": "variable is already declared", 
                 "variable": variable
             })
         case "notDeclared":
