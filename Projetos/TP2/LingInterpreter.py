@@ -226,17 +226,17 @@ class MyInterpreter(Interpreter):
         if len(r) > 1:
             match (r[1]):
                 case "==":
-                    return (r[0][0] == r[2][0], None, True)
+                    return (r[0][0] == r[2][0], f"{r[0][0]} == {r[2][0]}", True)
                 case "!=":
-                    return (r[0][0] != r[2][0], None, True)
+                    return (r[0][0] != r[2][0], f"{r[0][0]} != {r[2][0]}", True)
                 case ">":
-                    return (r[0][0] > r[2][0], None, True)
+                    return (r[0][0] > r[2][0], f"{r[0][0]} > {r[2][0]}", True)
                 case ">=":
-                    return (r[0][0] >= r[2][0], None, True)
+                    return (r[0][0] >= r[2][0], f"{r[0][0]} >= {r[2][0]}", True)
                 case "<":
-                    return (r[0][0] < r[2][0], None, True)
+                    return (r[0][0] < r[2][0], f"{r[0][0]} < {r[2][0]}", True)
                 case "<=":
-                    return (r[0][0] <= r[2][0], None, True)
+                    return (r[0][0] <= r[2][0], f"{r[0][0]} <= {r[2][0]}", True)
                 case _:
                     print("Invalid Operator")
         return r[0]
@@ -251,19 +251,19 @@ class MyInterpreter(Interpreter):
             match r[1]:
                 case "||":
                     if type(r[0][0]) is bool and type(r[2][0]) is bool:
-                        return (r[0][0] or r[2][0], None, True)
+                        return (r[0][0] or r[2][0], f"{r[0][0]} || {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} || {r[2][0]}", False)
                 case "-":
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] - r[2][0], None, True)
+                        return (r[0][0] - r[2][0], f"{r[0][0]} - {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} - {r[2][0]}", False)
                 case "+":
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] + r[2][0], None, True)
+                        return (r[0][0] + r[2][0], f"{r[0][0]} + {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} + {r[2][0]}", False)
                 case _:
                     print("Invalid Operator")
         else:
@@ -279,24 +279,24 @@ class MyInterpreter(Interpreter):
             match r[1]:
                 case "&&":
                     if type(r[0][0]) is bool and type(r[2][0]) is bool:
-                        return (r[0][0] and r[2][0], None, True)
+                        return (r[0][0] and r[2][0], f"{r[0][0]} && {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} && {r[2][0]}", False)
                 case "*":
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] * r[2][0], None, True)
+                        return (r[0][0] * r[2][0], f"{r[0][0]} * {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} * {r[2][0]}", False)
                 case "/":
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] / r[2][0], None, True)
+                        return (r[0][0] / r[2][0], f"{r[0][0]} / {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} / {r[2][0]}", False)
                 case "%":
                     if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] % r[2][0], None, True)
+                        return (r[0][0] % r[2][0], f"{r[0][0]} % {r[2][0]}", True)
                     else:
-                        return (None, None, False)
+                        return (None, f"{r[0][0]} % {r[2][0]}", False)
                 case _:
                     print("Invalid Operator")
 
@@ -313,9 +313,9 @@ class MyInterpreter(Interpreter):
     def factor_pot(self, tree):
         r = self.visit_children(tree)
         if type(r[0][0]) is (bool or str) or type(r[2][0]) is (bool or str):
-            return (None, None, False)
+            return (None, f"{r[0][0]} ^ {r[2][0]}", False)
         else:
-            return (r[0][0] ** r[2][0], None, True)
+            return (r[0][0] ** r[2][0], f"{r[0][0]} ^ {r[2][0]}", True)
     
     def selection(self, tree):
         self.count["selections"] += 1
@@ -340,4 +340,4 @@ class MyInterpreter(Interpreter):
                 if isinstance(child[0], tuple):
                     self.nesting += 1
 
-        return ("cycle", r[1][1])
+        return ("cycle", 0)
