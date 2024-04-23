@@ -49,7 +49,7 @@ def validate_error(errors, error_type, args):
             (var_type, variable, value) = args
             errors.append({
                 "type": "Type", 
-                "description": f"Value type ({value} => {str(type(value))})  doesn't match variable type ({var_type})", 
+                "description": f"Value type ({value} => {str(type(value).__name__)})  doesn't match variable type ({var_type})", 
                 "variable": variable
             })
         case "missing":
