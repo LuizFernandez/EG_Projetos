@@ -78,7 +78,7 @@ class MyInterpreter(Interpreter):
                 validate_error(self.erros, "notDeclared", (variable))
             if not flag_type:
                 validate_error(self.erros, "typing", (self.vars[variable]["type"], variable, value))
-            if not flag_val:
+            if not flag_val and variable in self.vars.keys():
                 validate_error(self.erros, "failedA", (variable, self.vars[variable]["type"], var_name))
 
         return self.vars
