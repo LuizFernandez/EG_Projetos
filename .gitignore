@@ -1,7 +1,7 @@
 # Ignore MarkDown Tables #
 ##########################
-./Projetos/TP2/Tables/*.md 
+Projetos/TP2/Tables/*.md 
 
 #    Ignore HTML Page    #
 ##########################
-./Projetos/TP2/*.html
+Projetos/TP2/*.html
