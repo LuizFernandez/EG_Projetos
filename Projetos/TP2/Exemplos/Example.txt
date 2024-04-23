@@ -1,9 +1,21 @@
-int a = 10
 
-int b = 11
-
-if(a > b){
+if(a){
+    list a_list = [1,2,3]
     if(b){
-        b = a
+        if(c){
+            if(d){
+               list b_list = [1,2,3] 
+            }
+        }
+        list c_list = [1,2,3] 
     }
+    while(True){
+        
+    }
+}
+
+if(e){
+   if(f){
+        list c_list = [1,2,3] 
+   }     
 }
