@@ -63,14 +63,14 @@ def validate_error(errors, error_type, args):
             (variable, var_type, value) = args
             errors.append({
                 "type": "Failed to Declare", 
-                "description": f"Variable {variable} of type {var_type} failed to be declared because variable {value} doesn't exist!", 
+                "description": f"Variable {variable} of type {var_type} failed to be declared because variable {value} doesn't exist", 
                 "variable": variable
             })
         case "failedA":
             (variable, var_type, value) = args
             errors.append({
                 "type": "Failed to Assign", 
-                "description": f"Variable {variable} of type {var_type} failed to recive a new value", 
+                "description": f"Variable {variable} of type {var_type} failed to recive a new value beacuse variable {value} doesn't exist", 
                 "variable": variable
             })
         case "faildArgC":
