@@ -66,7 +66,7 @@ class MyInterpreter(Interpreter):
         (value, var_name, flag_val) = self.visit(tree.children[1])
         flag_type = True
 
-        if flag_val and get_type(self.vars[variable]["type"]) is not type(value):
+        if variable in self.vars.keys() and flag_val and get_type(self.vars[variable]["type"]) is not type(value):
                 flag_type = False
                 if var_name != None:
                     self.vars[var_name]["used"] = False
