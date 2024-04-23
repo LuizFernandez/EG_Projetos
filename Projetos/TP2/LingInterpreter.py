@@ -226,35 +226,19 @@ class MyInterpreter(Interpreter):
         if len(r) > 1:
             match (r[1]):
                 case "==":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] == r[2][0], None, True)
-                    else:
-                        return (None, None, False)
+                    return (r[0][0] == r[2][0], None, True)
                 case "!=":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] != r[2][0], None, True)
-                    else:
-                        return (None, None, False)
+                    return (r[0][0] != r[2][0], None, True)
                 case ">":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] > r[2][0], None, True)
-                    else:
-                        return (None, None, False)
+                    return (r[0][0] > r[2][0], None, True)
                 case ">=":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] >= r[2][0], None, True)
-                    else:
-                        return (None, None, False)
+                    return (r[0][0] >= r[2][0], None, True)
                 case "<":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] < r[2][0], None, True)
-                    else:
-                        return (None, None, False)
+                    return (r[0][0] < r[2][0], None, True)
                 case "<=":
-                    if type(r[0][0]) is not (bool or str) and type(r[2][0]) is not (bool or str):
-                        return (r[0][0] <= r[2][0], None, True)
+                    return (r[0][0] <= r[2][0], None, True)
                 case _:
-                    print("Invalid Operator")
+                    print("Invalid Opereator")
         return r[0]
     
     def opr(self, tree):
