@@ -238,7 +238,7 @@ class MyInterpreter(Interpreter):
                 case "<=":
                     return (r[0][0] <= r[2][0], None, True)
                 case _:
-                    print("Invalid Opereator")
+                    print("Invalid Operator")
         return r[0]
     
     def opr(self, tree):
@@ -265,7 +265,7 @@ class MyInterpreter(Interpreter):
                     else:
                         return (None, None, False)
                 case _:
-                    print("Invalid Opereator")
+                    print("Invalid Operator")
         else:
             return r[0]
 
@@ -298,7 +298,7 @@ class MyInterpreter(Interpreter):
                     else:
                         return (None, None, False)
                 case _:
-                    print("Invalid Opereator")
+                    print("Invalid Operator")
 
         return r[0]
 
@@ -328,7 +328,8 @@ class MyInterpreter(Interpreter):
             if isinstance(r[2][0], tuple):
                 if len(r[2:]) == 1 and r[2][0][0] == "if":
                     if_list = r[2][0][2]
-                    self.sub_ifs.append([r[1][1]] + if_list)
+                    if r[1][1] != None:
+                        self.sub_ifs.append([r[1][1]] + if_list)
         return ("if", r[1][1], [r[1][1]] + if_list)
 
     def cycle(self, tree):

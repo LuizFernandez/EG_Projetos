@@ -123,8 +123,12 @@ def buildSubIf(sub_ifs):
     html_content = "<h2>Nested 'If' Conditions That Can be Combined</h2>"
     html_content += "<table border='1'><tr>"
     
+    
     # Determine the number of conditions in the largest sublist
-    max_conditions = max(len(sublist) for sublist in sub_ifs)
+    if len(sub_ifs) > 0:
+        max_conditions = max(len(sublist) for sublist in sub_ifs)
+    else:
+        max_conditions = 0
     
     # Add table headers based on the number of conditions
     for i in range(max_conditions):
