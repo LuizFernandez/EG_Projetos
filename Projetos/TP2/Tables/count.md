@@ -1,6 +1,6 @@
 | Type | Number |
 |------|--------|
-attributions|2
-declarations|18
-selections|8
+attributions|4
+declarations|2
+selections|1
 cycles|0

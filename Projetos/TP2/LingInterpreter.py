@@ -16,7 +16,7 @@ class MyInterpreter(Interpreter):
             self.visit(statement)
         return (self.vars, self.erros, self.types, self.count, self.nesting, self.sub_ifs)
     
-    def statment(self, tree):
+    def statment(self, tree): 
         r =  self.visit_children(tree)
         self.vars = r
         pass

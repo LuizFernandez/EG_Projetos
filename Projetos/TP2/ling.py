@@ -1,5 +1,6 @@
 from lark import Lark
 from LingInterpreter import MyInterpreter
+from GraphInterpreter import GraphInterpreter
 
 def buildVariaveis(data):
     file = open("./Tables/vars.md", "w")
@@ -154,7 +155,12 @@ def buildSubIf(sub_ifs):
 
     return html_content
 
-def buildHTML(data,erros,count,types,nesting,sub_ifs):
+def buildCFG(structure):
+    html_content = "<h2>CFG Graph of the code</h2>"
+
+    return html_content
+
+def buildHTML(data,erros,count,types,nesting,sub_ifs,structure):
     html_content = "<html><head><title>Analysis Result</title><style>"
     html_content += "body {font-family: Arial, sans-serif;}"
     html_content += "h2 {color: #333;}"
@@ -171,18 +177,22 @@ def buildHTML(data,erros,count,types,nesting,sub_ifs):
     html_content += buildCount(count)
     html_content += buildNesting(nesting)
     html_content += buildSubIf(sub_ifs)
+    html_content += buildCFG(structure)
     html_content += "</html>"
     
     # Write HTML content to a file
     with open('analise.html', 'w') as file:
         file.write(html_content)
 
-    print("Ficheiro HTML gerado com sucesso, os resultados da análise encontram-se no ficheiro 'analise.html'.")
+    print("\nFicheiro HTML gerado com sucesso, os resultados da análise encontram-se no ficheiro 'analise.html'.")
 
 with open("grammar.txt","r") as file:
     grammar = file.read()
 
-with open("./Exemplos/VarsExample.txt") as file:
+with open("grammarGraph.txt","r") as file:
+    grammarGraph = file.read()
+
+with open("./Exemplos/ifelse.txt") as file:
     exemple = file.read()
 
 p = Lark(grammar) # cria um objeto parser
@@ -190,7 +200,13 @@ p = Lark(grammar) # cria um objeto parser
 tree = p.parse(exemple)  # retorna uma tree
 (data, erros, types, count, nesting, sub_ifs) = MyInterpreter().visit(tree)
 
+p = Lark(grammarGraph) # cria um objeto parser
+
+tree = p.parse(exemple)  # retorna uma tree
+structure = GraphInterpreter().visit(tree)
+print(structure)
+
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
 #print("Lista de ifs aninhados que podem ser substituídos por um só if", sub_ifs)
 
-buildHTML(data,erros,count,types,nesting,sub_ifs)
+buildHTML(data,erros,count,types,nesting,sub_ifs,structure)
