@@ -34,7 +34,7 @@ complex_value : list_construct
 
 list_construct : LRPAR RRPAR
 			   | LRPAR value ("," value)* RRPAR
-			   | "list(" ID ")" # ID apenas pode ser do tipo arrary ou set                                      mas tem que ser uma variável
+			   | "list(" ID ")" 
 
 set_construct : "set()"
 			  | "set(" ID ")"

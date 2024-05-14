@@ -1,6 +1,7 @@
 from lark import Lark
 from LingInterpreter import MyInterpreter
 from GraphInterpreter import GraphInterpreter
+from Graphfunctions import create_cfg_graph
 
 def buildVariaveis(data):
     file = open("./Tables/vars.md", "w")
@@ -204,7 +205,7 @@ p = Lark(grammarGraph) # cria um objeto parser
 
 tree = p.parse(exemple)  # retorna uma tree
 structure = GraphInterpreter().visit(tree)
-print(structure)
+print(create_cfg_graph(structure))
 
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
 #print("Lista de ifs aninhados que podem ser substituídos por um só if", sub_ifs)

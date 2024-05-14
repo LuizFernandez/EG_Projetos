@@ -6,14 +6,14 @@ def create_cfg_graph(structure):
     for node_id, statement in structure.items():
         if statement == "fim":
             pass
+
         elif isinstance(statement, str):
             if isinstance(structure[node_id+1], str):
                 graph += f'  "{statement}" -> "{structure[node_id+1]}"\n'
             else:
                 graph += f'  "{statement}" -> "{structure[node_id+1][0]}"\n'
+
         elif isinstance(statement, list):
-            
-                
             if "else" in statement:
                 index_of_else = statement.index('else')
                 if_list = statement[:index_of_else]
@@ -34,7 +34,7 @@ def create_cfg_graph(structure):
 
                 if len(else_list) > 1:
                     graph += f'  "{statement[0]}" -> "{else_list[1]}" [label="false"]\n'
-                    if len(if_list) > 2:
+                    if len(else_list) > 2:
                         ant_stat = else_list[1]
 
                         for elem in else_list[2:]:
@@ -74,15 +74,3 @@ def create_cfg_graph(structure):
 
     return graph
 
-# Example structure
-structure = {
-    0: 'inicio',
-    1: 'int z = 1',
-    2: ['if(True)', 'z = 2', 'z = 3', 'else', 'z = 4', 'int z = 5'],
-    3: 'z = 6',
-    4: 'fim'
-}
-
-# Generate the CFG graph
-cfg_graph = create_cfg_graph(structure)
-print(cfg_graph)
