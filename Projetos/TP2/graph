@@ -1,0 +1,25 @@
+digraph {
+	"int z = 1"
+	inicio
+	inicio -> "int z = 1"
+	"if(True)"
+	"int z = 1"
+	"int z = 1" -> "if(True)"
+	"if(True)"
+	"if(True)" -> "z = z + 1" [label=true]
+	"z = 6"
+	"z = z + 1"
+	"z = z + 1" -> "z = 6"
+	"if(True)"
+	"if(True)" -> "z = 4" [label=false]
+	"list b = []"
+	"z = 4"
+	"z = 4" -> "list b = []"
+	"z = 6"
+	"list b = []"
+	"list b = []" -> "z = 6"
+	fim
+	"z = 6"
+	"z = 6" -> fim
+	"if(True)" [shape=diamond]
+}

@@ -2,6 +2,8 @@ from lark import Lark
 from LingInterpreter import MyInterpreter
 from GraphInterpreter import GraphInterpreter
 from Graphfunctions import create_cfg_graph
+import graphviz
+import re
 
 def buildVariaveis(data):
     file = open("./Tables/vars.md", "w")
@@ -157,7 +159,57 @@ def buildSubIf(sub_ifs):
     return html_content
 
 def buildCFG(structure):
+    # Define the graph
+    graph = graphviz.Digraph(format='png')
+    pattern = r'("[^"]+")\s+\[(\w+)=\"?(\w+)\"?\]'
+    label = ''
+
+    # Parse the graph data and add nodes and edges
+    for line in structure.split('\n'):
+        if line.strip():
+            # Se for um edge/ligação
+            if '->' in line:
+                parts = line.strip().split(' -> ')
+                if len(parts) == 2:
+                    node1, node2 = parts
+                    # se for so dois nodos
+                    if node2.startswith('"') and node2.endswith('"'):
+                        graph.node(node2[1:-1])
+                    # se houver info adicional (label)
+                    else:
+                        match = re.match(pattern, node2)
+                        node2 = match.group(1)
+                        #print(node2)
+                        atribute = match.group(2)
+                        value = match.group(3)
+                        if 'label' in atribute:
+                            label = value
+                        else:
+                            graph.node(node2[1:-1])
+                    graph.node(node1[1:-1])
+                    # se for necessário acresncentar label 
+                    if label != '':
+                        graph.edge(node1[1:-1], node2[1:-1],label=label)
+                        label = ''
+                    else:
+                        graph.edge(node1[1:-1], node2[1:-1])
+            # caso seja info adicional de nodo ou nodo isolado
+            else:
+                match = re.match(pattern, line.strip())
+                if match:
+                    node = match.group(1)
+                    atribute = match.group(2)
+                    value = match.group(3)
+                    if 'shape' in atribute:
+                        graph.node(node[1:-1],shape=value)
+                    else:
+                        graph.node(node[1:-1])
+
+    # Render the graph
+    graph.render('graph')
+    
     html_content = "<h2>CFG Graph of the code</h2>"
+    html_content += '<img src="graph.png" alt="Graph">'
 
     return html_content
 
@@ -210,4 +262,4 @@ print(create_cfg_graph(structure))
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
 #print("Lista de ifs aninhados que podem ser substituídos por um só if", sub_ifs)
 
-buildHTML(data,erros,count,types,nesting,sub_ifs,structure)
+buildHTML(data,erros,count,types,nesting,sub_ifs,create_cfg_graph(structure))
