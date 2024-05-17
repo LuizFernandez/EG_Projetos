@@ -208,7 +208,8 @@ class GraphInterpreter(Interpreter):
         return f"{r[0][0]}^{r[2][0]}"
 
     def selection(self, tree):
-        self.node += 1
+        if not self.in_selection:
+            self.node += 1
         self.in_selection = True
         self.structure[self.node] = []
         r = self.visit_children(tree)
@@ -219,4 +220,4 @@ class GraphInterpreter(Interpreter):
             else:
                 self.structure[self.node].append(str(elem))
         self.in_selection = False
-        return r[1][0]
+        return "IGNORE"

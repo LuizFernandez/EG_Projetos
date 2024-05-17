@@ -245,7 +245,7 @@ with open("grammar.txt","r") as file:
 with open("grammarGraph.txt","r") as file:
     grammarGraph = file.read()
 
-with open("./Exemplos/ifelse.txt") as file:
+with open("./Exemplos/ifelse2.txt") as file:
     exemple = file.read()
 
 p = Lark(grammar) # cria um objeto parser
@@ -257,6 +257,8 @@ p = Lark(grammarGraph) # cria um objeto parser
 
 tree = p.parse(exemple)  # retorna uma tree
 structure = GraphInterpreter().visit(tree)
+
+print(structure)
 print(create_cfg_graph(structure))
 
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)

@@ -1,0 +1,10 @@
+int z = 1
+
+if(True){
+    z = z + 1
+}else{
+    z = 4
+    list b = []
+}
+
+z = 6
