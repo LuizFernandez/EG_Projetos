@@ -140,17 +140,17 @@ class GraphInterpreter(Interpreter):
         if len(r) > 1:
             match (r[1]):
                 case "==":
-                    return f"{r[0][0]} == {r[2][0]}"
+                    return f"{r[0][0]} == {r[2]}"
                 case "!=":
-                    return f"{r[0][0]} != {r[2][0]}"
+                    return f"{r[0][0]} != {r[2]}"
                 case ">":
-                    return f"{r[0][0]} > {r[2][0]}"
+                    return f"{r[0][0]} > {r[2]}"
                 case ">=":
-                    return f"{r[0][0]} >= {r[2][0]}"
+                    return f"{r[0][0]} >= {r[2]}"
                 case "<":
-                    return f"{r[0][0]} < {r[2][0]}"
+                    return f"{r[0][0]} < {r[2]}"
                 case "<=":
-                    return f"{r[0][0]} <= {r[2][0]}"
+                    return f"{r[0][0]} <= {r[2]}"
                 case _:
                     print("Invalid Operator")
         return r[0]
@@ -164,11 +164,11 @@ class GraphInterpreter(Interpreter):
         if (len(r) > 1):
             match r[1]:
                 case "||":
-                    return f"{r[0][0]} || {r[2][0]}"
+                    return f"{r[0][0]} || {r[2]}"
                 case "-":
-                    return f"{r[0][0]} - {r[2][0]}"
+                    return f"{r[0][0]} - {r[2]}"
                 case "+":
-                    return f"{r[0][0]} + {r[2][0]}"
+                    return f"{r[0][0]} + {r[2]}"
                 case _:
                     print("Invalid Operator")
         else:
@@ -183,13 +183,13 @@ class GraphInterpreter(Interpreter):
         if (len(r) > 1):
             match r[1]:
                 case "&&":
-                    return f"{r[0][0]} && {r[2][0]}"
+                    return f"{r[0][0]} && {r[2]}"
                 case "*":
-                    return f"{r[0][0]} * {r[2][0]}"
+                    return f"{r[0][0]} * {r[2]}"
                 case "/":
-                    return f"{r[0][0]} / {r[2][0]}"
+                    return f"{r[0][0]} / {r[2]}"
                 case "%":
-                    return f"{r[0][0]} % {r[2][0]}"
+                    return f"{r[0][0]} % {r[2]}"
                 case _:
                     print("Invalid Operator")
 

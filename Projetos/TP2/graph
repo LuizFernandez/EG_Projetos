@@ -2,19 +2,19 @@ digraph {
 	"int z = 1"
 	inicio
 	inicio -> "int z = 1"
-	"if(z == 2)"
+	"if(z == 20)"
 	"int z = 1"
-	"int z = 1" -> "if(z == 2)"
-	"if(z == 2)"
-	"if(z == 2)" -> "z = 3" [label=true]
+	"int z = 1" -> "if(z == 20)"
+	"if(z == 20)"
+	"if(z == 20)" -> "z = 3" [label=true]
 	"z = 4"
 	"z = 3"
 	"z = 3" -> "z = 4"
 	"z = 20"
 	"z = 4"
 	"z = 4" -> "z = 20"
-	"if(z == 2)"
-	"if(z == 2)" -> "if(z == 3)" [label=false]
+	"if(z == 20)"
+	"if(z == 20)" -> "if(z == 3)" [label=false]
 	"if(z == 3)"
 	"if(z == 3)" -> "z = 6" [label=true]
 	"z = 20"
@@ -40,5 +40,5 @@ digraph {
 	"z = 20" -> fim
 	"if(z == 4)" [shape=diamond]
 	"if(z == 3)" [shape=diamond]
-	"if(z == 2)" [shape=diamond]
+	"if(z == 20)" [shape=diamond]
 }
