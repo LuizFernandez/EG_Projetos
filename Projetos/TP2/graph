@@ -38,5 +38,7 @@ digraph {
 	fim
 	"z = 20"
 	"z = 20" -> fim
+	"if(z == 4)" [shape=diamond]
+	"if(z == 3)" [shape=diamond]
 	"if(z == 2)" [shape=diamond]
 }

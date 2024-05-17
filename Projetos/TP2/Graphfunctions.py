@@ -159,7 +159,10 @@ def create_cfg_graph(structure):
         if isinstance(statment, list) and "IGNORE" not in statment:
             graph+= f'  "{statment[0]}" [shape=diamond];\n'
         elif isinstance(statment, list):
-            graph+= f'  "{last_if(statment)}" [shape=diamond];\n'
+            for elem in statment:
+                if elem.startswith("if("):
+                    graph+= f'  "{elem}" [shape=diamond];\n'
+            
         
     # Close the graph
     graph += "}\n"
