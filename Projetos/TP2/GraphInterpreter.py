@@ -6,7 +6,7 @@ class GraphInterpreter(Interpreter):
     def __init__(self):
         self.structure = {0 : "inicio"}
         self.node = 0
-        self.in_selection = False
+        self.depth = 0
 
     def start(self, tree):
         r = self.visit_children(tree)
@@ -30,7 +30,7 @@ class GraphInterpreter(Interpreter):
             else:
                 result += r[2]
                 
-        if(self.in_selection == False):
+        if self.depth == 0:
             self.node += 1
             self.structure[self.node] = result
             
@@ -48,7 +48,7 @@ class GraphInterpreter(Interpreter):
         else:
             result += r[1]
 
-        if(self.in_selection == False):
+        if self.depth == 0:
             self.node += 1
             self.structure[self.node] = result
         
@@ -208,9 +208,10 @@ class GraphInterpreter(Interpreter):
         return f"{r[0][0]}^{r[2][0]}"
 
     def selection(self, tree):
-        if not self.in_selection:
+        if self.depth == 0:
             self.node += 1
-        self.in_selection = True
+        self.depth += 1
+
         self.structure[self.node] = []
         r = self.visit_children(tree)
         self.structure[self.node].append(f"if({r[1][0]})")
@@ -219,5 +220,6 @@ class GraphInterpreter(Interpreter):
                 self.structure[self.node].append(elem[0])
             else:
                 self.structure[self.node].append(str(elem))
-        self.in_selection = False
+
+        self.depth -= 1
         return "IGNORE"
