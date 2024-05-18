@@ -1,3 +1,3 @@
 | Type | Vars | Number |
 |------|------|--------|
-int|z|1
+int|z, b, c|3

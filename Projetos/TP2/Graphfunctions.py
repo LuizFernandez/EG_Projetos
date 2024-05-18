@@ -10,12 +10,16 @@ def last_if(statment):
 
 def create_cfg_graph(structure):
     graph = "digraph G {\n"
+    cycle = None
     for node_id, statment in structure.items():
         if statment == "fim":
             pass
 
         elif isinstance(statment, str):
             if isinstance(structure[node_id+1], str):
+                if cycle:
+                    graph += f'  "{cycle}" -> "{statment}" [label="false"]\n'
+                    cycle = None
                 graph += f'  "{statment}" -> "{structure[node_id+1]}"\n'
             elif "IGNORE" not in structure[node_id+1]:
                 graph += f'  "{statment}" -> "{structure[node_id+1][0]}"\n'
@@ -23,6 +27,8 @@ def create_cfg_graph(structure):
                 graph += f'  "{statment}" -> "{last_if(structure[node_id+1])}"\n'
 
         elif isinstance(statment, list):
+            print(statment)
+            print('while' in statment)
             if "else" in statment:
                 if statment.count("else") == 1:
                     index_of_else = statment.index('else')
@@ -129,18 +135,22 @@ def create_cfg_graph(structure):
                                     graph += f'  "{else_list[-1]}" -> "{last_if(structure[node_id+1])}"\n'
                             else:
                                 graph += f'  "{if_list[0]}" -> "{structure[node_id+1][0]}" [label="false"]\n'                       
-
             else:
+                print("AAAAAAAA")
                 if len(statment) > 1:
                     graph += f'  "{statment[0]}" -> "{statment[1]}" [label="true"]\n'
+                    if ('while' in statment[0]):
+                        cycle = statment[0]
                     if len(statment) > 2:
                         ant_stat = statment[1]
-
                         for elem in statment[2:]:
                                 graph += f'  "{ant_stat}" -> "{elem}"\n'
                                 ant_stat = elem
                         if isinstance(structure[node_id+1], str):
-                            graph += f'  "{statment[-1]}" -> "{structure[node_id+1]}"\n'
+                            if cycle:
+                                graph += f'  "{statment[-1]}" -> "{cycle}"\n'
+                            else:
+                                graph += f'  "{statment[-1]}" -> "{structure[node_id+1]}"\n'
                         elif "IGNORE" not in structure[node_id+1]:
                             graph += f'  "{statment[-1]}" -> "{structure[node_id+1][0]}"\n'
                         else:

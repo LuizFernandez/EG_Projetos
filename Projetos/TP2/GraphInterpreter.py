@@ -223,3 +223,20 @@ class GraphInterpreter(Interpreter):
 
         self.depth -= 1
         return "IGNORE"
+    
+    def cycle(self,tree):
+        if self.depth == 0:
+            self.node += 1
+        self.depth += 1
+        self.structure[self.node] = []
+        r = self.visit_children(tree)
+        print(r)
+        if r[0].type == 'WHILE':
+            self.structure[self.node].append(f"while({r[1][0]})")
+            for elem in r[2:]:
+                if isinstance(elem, list):
+                    self.structure[self.node].append(elem[0])
+                else:
+                    self.structure[self.node].append(str(elem))
+        print(self.structure[self.node])
+        self.depth -= 1

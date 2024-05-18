@@ -177,6 +177,7 @@ def buildCFG(structure):
                         graph.node(node2[1:-1])
                     # se houver info adicional (label)
                     else:
+                        print(node2)
                         match = re.match(pattern, node2)
                         node2 = match.group(1)
                         #print(node2)
@@ -249,7 +250,7 @@ with open("grammar.txt","r") as file:
 with open("grammarGraph.txt","r") as file:
     grammarGraph = file.read()
 
-with open("./Exemplos/ifelse2.txt") as file:
+with open("./Exemplos/while.txt") as file:
     exemple = file.read()
 
 p = Lark(grammar) # cria um objeto parser

@@ -1,44 +1,25 @@
 digraph {
-	"int z = 1"
+	"int z = 5"
 	inicio
-	inicio -> "int z = 1"
-	"if(z == 20)"
-	"int z = 1"
-	"int z = 1" -> "if(z == 20)"
-	"if(z == 20)"
-	"if(z == 20)" -> "z = 3" [label=true]
-	"z = 4"
-	"z = 3"
-	"z = 3" -> "z = 4"
-	"z = 20"
-	"z = 4"
-	"z = 4" -> "z = 20"
-	"if(z == 20)"
-	"if(z == 20)" -> "if(z == 3)" [label=false]
-	"if(z == 3)"
-	"if(z == 3)" -> "z = 6" [label=true]
-	"z = 20"
-	"z = 6"
-	"z = 6" -> "z = 20"
-	"if(z == 3)"
-	"if(z == 3)" -> "if(z == 4)" [label=false]
-	"if(z == 4)"
-	"if(z == 4)" -> "z = 8" [label=true]
-	"z = 20"
-	"z = 8"
-	"z = 8" -> "z = 20"
-	"if(z == 4)"
-	"if(z == 4)" -> "z = 9" [label=false]
-	"z = 10"
-	"z = 9"
-	"z = 9" -> "z = 10"
-	"z = 20"
-	"z = 10"
-	"z = 10" -> "z = 20"
+	inicio -> "int z = 5"
+	"int b = 0"
+	"int z = 5"
+	"int z = 5" -> "int b = 0"
+	"while(z < 5)"
+	"int b = 0"
+	"int b = 0" -> "while(z < 5)"
+	"while(z < 5)"
+	"while(z < 5)" -> "z = z - 1" [label=true]
+	"b = b + 1"
+	"z = z - 1"
+	"z = z - 1" -> "b = b + 1"
+	"while(z < 5)"
+	"b = b + 1"
+	"b = b + 1" -> "while(z < 5)"
+	"while(z < 5)"
+	"while(z < 5)" -> "int c = b" [label=false]
 	fim
-	"z = 20"
-	"z = 20" -> fim
-	"if(z == 4)" [shape=diamond]
-	"if(z == 3)" [shape=diamond]
-	"if(z == 20)" [shape=diamond]
+	"int c = b"
+	"int c = b" -> fim
+	"while(z < 5)" [shape=diamond]
 }
