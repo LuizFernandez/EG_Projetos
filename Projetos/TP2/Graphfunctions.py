@@ -1,170 +1,652 @@
 from collections import defaultdict
 
-def last_if(statment):
-    last_if = None
-    for elem in reversed(statment):
-        if elem.startswith("if("):
-            last_if = elem
-            break
-    return last_if
+conditions = []
 
-def create_cfg_graph(structure):
-    graph = "digraph G {\n"
-    for node_id, statment in structure.items():
-        if statment == "fim":
-            pass
+def next(tuple, declarations, attributions, selections, cycle):
 
-        elif isinstance(statment, str):
-            if isinstance(structure[node_id+1], str):
-                graph += f'  "{statment}" -> "{structure[node_id+1]}"\n'
-            elif "IGNORE" not in structure[node_id+1]:
-                graph += f'  "{statment}" -> "{structure[node_id+1][0]}"\n'
+    match (tuple[0]):
+        case "declaration":
+            return declarations["statments"][tuple[1]]
+        case "attribution":
+            return attributions["statments"][tuple[1]]
+        case "ifs":
+            return selections["statments"][tuple[1]]["condition"]
+        case "ifelses":
+            return selections["statments"][tuple[1]]["condition"]
+        case "while":
+            return cycle["statments"][tuple[1]]["condition"]
+        case _:
+            return ""
+    
+def nesting(tuple, next_value, declarations, attributions, selections, cycle):
+    graph = ""
+     
+    match (tuple[0]):
+        case "ifs":
+            condition = selections["statments"][tuple[1]]["condition"]
+            conditions.append(condition)
+            body = selections["statments"][tuple[1]]["body"]
+            if len(body) > 0:
+                ant = body[0]
+                value = next(ant, declarations, attributions, selections, cycle)
+                graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                if len(body) > 1:
+                    for elem in body[1:]:
+                        elem_value = next(elem, declarations, attributions, selections, cycle) 
+                        match (ant[0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{value}" -> "{elem_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                        ant = elem
+                        value = elem_value
+                    match (body[-1][0]):
+                        case "declaration" | "attribution" :
+                            graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
+                        case "ifs" | "ifelses" | "while":
+                            graph += nesting(body[-1], next_value, declarations, attributions, selections, cycle)
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
+                else:
+                    match (ant[0]):
+                        case "declaration" | "attribution" :
+                            graph += f'"{value}" -> "{next_value}"\n'
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
+                        case "ifs" | "ifelses" | "while":
+                            graph += nesting(ant, next_value, declarations, attributions, selections, cycle)
             else:
-                graph += f'  "{statment}" -> "{last_if(structure[node_id+1])}"\n'
+                graph += f'"{condition}" -> "{next_value}"\n'
 
-        elif isinstance(statment, list):
-            if "else" in statment:
-                if statment.count("else") == 1:
-                    index_of_else = statment.index('else')
-                    if_list = statment[:index_of_else]
-                    else_list = statment[index_of_else:]
-
+        case "ifelses":
+            condition = selections["statments"][tuple[1]]["condition"]
+            conditions.append(condition)
+            body = selections["statments"][tuple[1]]["body"]
+            if_list = body["if"]
+            else_list = body["else"]
+            if len(if_list) > 0 and len(else_list) > 0:
+                if len(if_list) > 0:
+                    ant = if_list[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(if_list) > 1:
-                        graph += f'  "{statment[0]}" -> "{if_list[1]}" [label="true"]\n'
-                        if len(if_list) > 2:
-                            ant_stat = if_list[1]
-
-                            for elem in if_list[2:]:
-                                    graph += f'  "{ant_stat}" -> "{elem}"\n'
-                                    ant_stat = elem
-                        if isinstance(structure[node_id+1], str):
-                            graph += f'  "{if_list[-1]}" -> "{structure[node_id+1]}"\n'
-                        elif "IGNORE" not in structure[node_id+1]:
-                            graph += f'  "{if_list[-1]}" -> "{structure[node_id+1][0]}"\n'
-                        else:
-                            graph += f'  "{if_list[-1]}" -> "{last_if(structure[node_id+1])}"\n'
+                        for elem in if_list[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (if_list[-1][0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(if_list[-1], next_value, declarations, attributions, selections, cycle)
                     else:
-                        if isinstance(structure[node_id+1], str):
-                            graph += f'  "{statment[0]}" -> "{structure[node_id+1]}" [label="true"]\n'
-                        elif "IGNORE" not in structure[node_id+1]:
-                            graph += f'  "{statment[0]}" -> "{structure[node_id+1][0]}"\n'
-                        else:
-                            graph += f'  "{statment[0]}" -> "{last_if(structure[node_id+1])}"\n'
-  
+                        match (ant[0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{value}" -> "{next_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(ant, next_value, declarations, attributions, selections, cycle)
+                else:
+                    graph += f'"{condition}" -> "{next_value}" [label="true"]\n'
 
+                if len(else_list) > 0:
+                    ant = else_list[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="false"]\n'
                     if len(else_list) > 1:
-                        graph += f'  "{statment[0]}" -> "{else_list[1]}" [label="false"]\n'
-                        if len(else_list) > 2:
-                            ant_stat = else_list[1]
-
-                            for elem in else_list[2:]:
-                                graph += f'  "{ant_stat}" -> "{elem}"\n'
-                                ant_stat = elem
-                        if isinstance(structure[node_id+1], str):
-                            graph += f'  "{else_list[-1]}" -> "{structure[node_id+1]}"\n'
-                        elif "IGNORE" not in structure[node_id+1]:
-                            graph += f'  "{else_list[-1]}" -> "{structure[node_id+1][0]}"\n'
-                        else:
-                            graph += f'  "{else_list[-1]}" -> "{last_if(structure[node_id+1])}"\n'
+                        for elem in else_list[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (else_list[-1][0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(else_list[-1], next_value, declarations, attributions, selections, cycle)
                     else:
-                        if isinstance(structure[node_id+1], str):
-                            graph += f'  "{statment[0]}" -> "{structure[node_id+1]}" [label="false"]\n'
-                        elif "IGNORE" not in structure[node_id+1]:
-                            graph += f'  "{statment[0]}" -> "{structure[node_id+1][0]}"\n'
-                        else:
-                            graph += f'  "{statment[0]}" -> "{last_if(structure[node_id+1])}"\n'
-
+                        match (ant[0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{value}" -> "{next_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(ant, next_value, declarations, attributions, selections, cycle)
                 else:
-                    if_lists = []
-                    else_list = [] 
-                    for index, elem in enumerate(statment):
-                        create_list = []
-                        if elem.startswith("if("):
-                            create_list.append(elem)
-                            for value in statment[(index + 1):]:
-                                if value.startswith("if(") or value == "else":
-                                    break
-                                create_list.append(value)
-                            if_lists = [create_list] + if_lists
-                        elif elem == "else":
-                            if statment[(index + 1)] != "IGNORE":
-                                create_list.append(elem)
-                                for value in statment[(index + 1):]:
-                                    if value.startswith("if(") or value == "else":
-                                        break
-                                    create_list.append(value)
-                                else_list = create_list
-
-                    for index, if_list in enumerate(if_lists):
-                        if len(if_list) > 1:
-                            graph += f'  "{if_list[0]}" -> "{if_list[1]}" [label="true"]\n'
-                            if len(if_list) > 2:
-                                ant_stat = if_list[1]
-
-                                for elem in if_list[2:]:
-                                        graph += f'  "{ant_stat}" -> "{elem}"\n'
-                                        ant_stat = elem
-                            if isinstance(structure[node_id+1], str):
-                                graph += f'  "{if_list[-1]}" -> "{structure[node_id+1]}"\n'
-                            elif "IGNORE" not in structure[node_id+1]:
-                                graph += f'  "{if_list[-1]}" -> "{structure[node_id+1][0]}"\n'
-                            else:
-                                graph += f'  "{if_list[-1]}" -> "{last_if(structure[node_id+1])}"\n'
-
-                            if index + 1 <= len(if_list):
-                                graph += f'  "{if_list[0]}" -> "{if_lists[index + 1][0]}" [label="false"]\n'
-                            elif else_list != [] and len(else_list) > 1:
-                                graph += f'  "{if_list[0]}" -> "{else_list[1]}" [label="false"]\n'
-                                if len(else_list) > 2:
-                                    ant_stat = else_list[1]
-
-                                    for elem in else_list[2:]:
-                                            graph += f'  "{ant_stat}" -> "{elem}"\n'
-                                            ant_stat = elem
-                                if isinstance(structure[node_id+1], str):
-                                    graph += f'  "{else_list[-1]}" -> "{structure[node_id+1]}"\n'
-                                elif "IGNORE" not in structure[node_id+1]:
-                                    graph += f'  "{else_list[-1]}" -> "{structure[node_id+1][0]}"\n'
-                                else:
-                                    graph += f'  "{else_list[-1]}" -> "{last_if(structure[node_id+1])}"\n'
-                            else:
-                                graph += f'  "{if_list[0]}" -> "{structure[node_id+1][0]}" [label="false"]\n'                       
-
+                    graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
             else:
-                if len(statment) > 1:
-                    graph += f'  "{statment[0]}" -> "{statment[1]}" [label="true"]\n'
-                    if len(statment) > 2:
-                        ant_stat = statment[1]
-
-                        for elem in statment[2:]:
-                                graph += f'  "{ant_stat}" -> "{elem}"\n'
-                                ant_stat = elem
-                        if isinstance(structure[node_id+1], str):
-                            graph += f'  "{statment[-1]}" -> "{structure[node_id+1]}"\n'
-                        elif "IGNORE" not in structure[node_id+1]:
-                            graph += f'  "{statment[-1]}" -> "{structure[node_id+1][0]}"\n'
-                        else:
-                            graph += f'  "{statment[-1]}" -> "{last_if(structure[node_id+1])}"\n'
+                graph += f'"{condition}" -> "{next_value}"\n'
+            
+        case "while":
+            condition = cycle["statments"][tuple[1]]["condition"]
+            conditions.append(condition)
+            body = cycle["statments"][tuple[1]]["body"]
+            if len(body) > 0:
+                ant = body[0]
+                value = next(ant, declarations, attributions, selections, cycle)
+                graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                if len(body) > 1:
+                    for elem in body[1:]:
+                        elem_value = next(elem, declarations, attributions, selections, cycle) 
+                        match (ant[0]):
+                            case "declaration" | "attribution" :
+                                graph += f'"{value}" -> "{elem_value}"\n'
+                            case "ifs" | "ifelses" | "while":
+                                graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                        ant = elem
+                        value = elem_value
+                    match (body[-1][0]):
+                        case "declaration" | "attribution" :
+                            graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
+                        case "ifs" | "ifelses" | "while":
+                            graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
                 else:
-                    if isinstance(structure[node_id+1], str):
-                        graph += f'  "{statment[0]}" -> "{structure[node_id+1]}"\n'
-                    elif "IGNORE" not in structure[node_id+1]:
-                        graph += f'  "{statment[0]}" -> "{structure[node_id+1][0]}"\n'
+                    match (ant[0]):
+                        case "declaration" | "attribution" :
+                            graph += f'"{value}" -> "{condition}"\n'
+                            graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
+                        case "ifs" | "ifelses" | "while":
+                            graph += nesting(ant, condition, declarations, attributions, selections, cycle)
+        case _:
+            return ""
+         
+    return graph
+
+
+
+def create_cfg_graph(structure, declarations, attributions, selections, cycle):
+    graph = "digraph G {\n"
+
+    if structure["occor"] > 0:
+        statment = structure["statments"][0][0]
+        match (statment[0]):
+            case "declaration":
+                value = next(statment, declarations, attributions, selections, cycle)
+                graph += f'"inicio" -> "{value}"\n'
+                if structure["occor"] > 1:
+                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                else:
+                    graph += f'"{value}" -> "fim"\n'
+            case "attribution":
+                value = next(statment, declarations, attributions, selections, cycle)
+                graph += f'"inicio" -> "{value}"\n'
+                if structure["occor"] > 1:
+                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                else:
+                    graph += f'"{value}" -> "fim"\n'
+            case "ifs":
+                condition = selections["statments"][statment[1]]["condition"]
+                conditions.append(condition)
+                body = selections["statments"][statment[1]]["body"]
+                graph += f'"inicio" -> "{condition}"\n'
+
+                if len(body) > 0:
+                    ant = body[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                    if len(body) > 1:
+                        for elem in body[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (body[-1][0]):
+                            case "declaration" | "attribution" :
+                                if structure["occor"] > 1:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+                                if structure["occor"] > 1:
+                                    graph += nesting(body[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += nesting(body[-1], "fim", declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                
                     else:
-                        graph += f'  "{statment[0]}" -> "{last_if(structure[node_id+1])}"\n'
+                        match (ant[0]):
+                            case "declaration" | "attribution" :  
+                                if structure["occor"] > 1:
+                                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{value}" -> "fim"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
 
-            
+                                if structure["occor"] > 1:
+                                    graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                else:
+                                    graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
-    for node_id, statment in structure.items():
-        if isinstance(statment, list) and "IGNORE" not in statment:
-            graph+= f'  "{statment[0]}" [shape=diamond];\n'
-        elif isinstance(statment, list):
-            for elem in statment:
-                if elem.startswith("if("):
-                    graph+= f'  "{elem}" [shape=diamond];\n'
-            
-        
-    # Close the graph
+                else:
+                    if structure["occor"] > 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+
+            case "ifelses":
+                condition = selections["statments"][statment[1]]["condition"]
+                conditions.append(condition)
+                body = selections["statments"][statment[1]]["body"]
+                if_list = body["if"]
+                else_list = body["else"]
+                graph += f'"inicio" -> "{condition}"\n'
+
+                if len(if_list) > 0 and len(else_list) > 0:
+                    #--------------------------Caso de if----------------------------------
+                    if len(if_list) > 0:
+                        ant = if_list[0]
+                        value = next(ant, declarations, attributions, selections, cycle)
+                        graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                        if len(if_list) > 1:
+                            for elem in if_list[1:]:
+                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                match (ant[0]):
+                                    case "declaration" | "attribution" :
+                                        graph += f'"{value}" -> "{elem_value}"\n'
+                                    case "ifs" | "ifelses" | "while":
+                                        graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                                ant = elem
+                                value = elem_value
+                            match (if_list[-1][0]):
+                                case "declaration" | "attribution" :
+                                    if structure["occor"] > 1:
+                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    if structure["occor"] > 1:
+                                        graph += nesting(if_list[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(if_list[-1], "fim", declarations, attributions, selections, cycle)
+                        else:
+                            match (ant[0]):
+                                case "declaration" | "attribution" :  
+                                    if structure["occor"] > 1:
+                                        graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{value}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+
+                                    if structure["occor"] > 1:
+                                        graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                    else:
+                        if structure["occor"] > 1:
+                            graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
+                        else:
+                            graph += f'"{condition}" -> "fim" [label="true"]\n'
+                    
+                    #--------------------------Caso de else----------------------------------
+                    if len(else_list) > 0:
+                        ant = else_list[0]
+                        value = next(ant, declarations, attributions, selections, cycle)
+                        graph += f'"{condition}" -> "{value}" [label="false"]\n'
+                        if len(else_list) > 1:
+                            for elem in else_list[1:]:
+                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                match (ant[0]):
+                                    case "declaration" | "attribution" :
+                                        graph += f'"{value}" -> "{elem_value}"\n'
+                                    case "ifs" | "ifelses" | "while":
+                                        graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                                ant = elem
+                                value = elem_value
+                            match (else_list[-1][0]):
+                                case "declaration" | "attribution" :
+                                    if structure["occor"] > 1:
+                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    if structure["occor"] > 1:
+                                        graph += nesting(else_list[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(else_list[-1], "fim", declarations, attributions, selections, cycle)
+                        
+                        else:
+                            match (ant[0]):
+                                case "declaration" | "attribution" :  
+                                    if structure["occor"] > 1:
+                                        graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{value}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+
+                                    if structure["occor"] > 1:
+                                        graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                    else:
+                        if structure["occor"] > 1:
+                            graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                        else:
+                            graph += f'"{condition}" -> "fim" [label="false"]\n'
+                else:
+                    if structure["occor"] > 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+
+
+            case "while":
+                condition = cycle["statments"][statment[1]]["condition"]
+                conditions.append(condition)
+                body = cycle["statments"][statment[1]]["body"]
+                graph += f'"inicio" -> "{condition}"\n'
+
+                if len(body) > 0:
+                    ant = body[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                    if len(body) > 1:
+                        for elem in body[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (body[-1][0]):
+                            case "declaration" | "attribution" :
+                                if structure["occor"] > 1:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{condition}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+                                if structure["occor"] > 1:
+                                    graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                    else:
+                        match (ant[0]):
+                            case "declaration" | "attribution" :  
+                                if len(structure) > 1:
+                                    graph += f'"{value}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{value}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+
+                                if structure["occor"] > 1:
+                                    graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                else:
+                                    graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                else:
+                    if structure["occor"] > 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+    else:
+        return 'digraph G {\n"inicio" -> "fim"\n}'
+
+    
+    for node_id, statment in structure["statments"].items():
+        if(node_id == 0):
+            continue
+
+        match (statment[0][0]):
+            case "declaration":
+                value = next(statment[0], declarations, attributions, selections, cycle)
+                if structure["occor"] != node_id + 1:
+                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                else:
+                    graph += f'"{value}" -> "fim"\n'
+            case "attribution":
+                value = next(statment[0], declarations, attributions, selections, cycle)
+                if structure["occor"] != node_id + 1:
+                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                else:
+                    graph += f'"{value}" -> "fim"\n'
+            case "ifs":
+                condition = selections["statments"][statment[0][1]]["condition"]
+                conditions.append(condition)
+                body = selections["statments"][statment[0][1]]["body"]
+
+                if len(body) > 0:
+                    ant = body[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                    if len(body) > 1:
+                        for elem in body[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (body[-1][0]):
+                            case "declaration" | "attribution" :
+                                if structure["occor"] != node_id + 1:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+                                if structure["occor"] != node_id + 1:
+                                    graph += nesting(body[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += nesting(body[-1], "fim", declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                
+                    else:
+                        match (ant[0]):
+                            case "declaration" | "attribution" :  
+                                if structure["occor"] != node_id + 1:
+                                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{value}" -> "fim"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+
+                                if structure["occor"] != node_id + 1:
+                                    graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                else:
+                                    graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                else:
+                    if structure["occor"] != node_id + 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+
+            case "ifelses":
+                condition = selections["statments"][statment[0][1]]["condition"]
+                conditions.append(condition)
+                body = selections["statments"][statment[0][1]]["body"]
+                if_list = body["if"]
+                else_list = body["else"]
+
+                if len(if_list) > 0 and len(else_list) > 0:
+                    #--------------------------Caso de if----------------------------------
+                    if len(if_list) > 0:
+                        ant = if_list[0]
+                        value = next(ant, declarations, attributions, selections, cycle)
+                        graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                        if len(if_list) > 1:
+                            for elem in if_list[1:]:
+                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                match (ant[0]):
+                                    case "declaration" | "attribution" :
+                                        graph += f'"{value}" -> "{elem_value}"\n'
+                                    case "ifs" | "ifelses" | "while":
+                                        graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                                ant = elem
+                                value = elem_value
+                            match (if_list[-1][0]):
+                                case "declaration" | "attribution" :
+                                    if structure["occor"] != node_id + 1:
+                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    if structure["occor"] != node_id + 1:
+                                        graph += nesting(if_list[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(if_list[-1], "fim", declarations, attributions, selections, cycle)
+                        else:
+                            match (ant[0]):
+                                case "declaration" | "attribution" :  
+                                    if structure["occor"] != node_id + 1:
+                                        graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{value}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+
+                                    if structure["occor"] != node_id + 1:
+                                        graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                    else:
+                        if structure["occor"] != node_id + 1:
+                            graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
+                        else:
+                            graph += f'"{condition}" -> "fim" [label="true"]\n'
+                    
+                    #--------------------------Caso de else----------------------------------
+                    if len(else_list) > 0:
+                        ant = else_list[0]
+                        value = next(ant, declarations, attributions, selections, cycle)
+                        graph += f'"{condition}" -> "{value}" [label="false"]\n'
+                        if len(else_list) > 1:
+                            for elem in else_list[1:]:
+                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                match (ant[0]):
+                                    case "declaration" | "attribution" :
+                                        graph += f'"{value}" -> "{elem_value}"\n'
+                                    case "ifs" | "ifelses" | "while":
+                                        graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                                ant = elem
+                                value = elem_value
+                            match (else_list[-1][0]):
+                                case "declaration" | "attribution" :
+                                    if structure["occor"] != node_id + 1:
+                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    if structure["occor"] != node_id + 1:
+                                        graph += nesting(else_list[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(else_list[-1], "fim", declarations, attributions, selections, cycle)
+                        
+                        else:
+                            match (ant[0]):
+                                case "declaration" | "attribution" :  
+                                    if structure["occor"] != node_id + 1:
+                                        graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    else:
+                                        graph += f'"{value}" -> "fim"\n'
+                                case "ifs" | "ifelses" | "while":
+
+                                    if structure["occor"] != node_id + 1:
+                                        graph += nesting(ant, next(structure["statments"][node_id +1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    else:
+                                        graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                    else:
+                        if structure["occor"] != node_id + 1:
+                            graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                        else:
+                            graph += f'"{condition}" -> "fim" [label="false"]\n'
+                else:
+                    if structure["occor"] != node_id + 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+
+
+            case "while":
+                condition = cycle["statments"][statment[0][1]]["condition"]
+                conditions.append(condition)
+                body = cycle["statments"][statment[0][1]]["body"]
+
+                if len(body) > 0:
+                    ant = body[0]
+                    value = next(ant, declarations, attributions, selections, cycle)
+                    graph += f'"{condition}" -> "{value}" [label="true"]\n'
+                    if len(body) > 1:
+                        for elem in body[1:]:
+                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            match (ant[0]):
+                                case "declaration" | "attribution" :
+                                    graph += f'"{value}" -> "{elem_value}"\n'
+                                case "ifs" | "ifelses" | "while":
+                                    graph += nesting(ant, elem_value, declarations, attributions, selections, cycle)
+                            ant = elem
+                            value = elem_value
+                        match (body[-1][0]):
+                            case "declaration" | "attribution" :
+                                if structure["occor"] != node_id + 1:
+                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{condition}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+                                if structure["occor"] != node_id + 1:
+                                    graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                    else:
+                        match (ant[0]):
+                            case "declaration" | "attribution" :  
+                                if structure["occor"] != node_id + 1:
+                                    graph += f'"{value}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                else:
+                                    graph += f'"{value}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "fim" [label="false"]\n'
+                            case "ifs" | "ifelses" | "while":
+                                if structure["occor"] != node_id + 1:
+                                    graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                else:
+                                    graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
+
+                else:
+                    if structure["occor"] != node_id + 1:
+                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                    else:
+                        graph += f'"{condition}" -> "fim"\n'
+
+    for cond in conditions:
+        graph+= f'"{cond}" [shape=diamond];\n'
+
+
     graph += "}\n"
 
     return graph
