@@ -245,7 +245,9 @@ class GraphInterpreter(Interpreter):
         body = {"if": [], "else": []}
         key = "if"
         for st in r[2:]:
-            if type(st) is not list:
+            if key == "else" and type(st) is tuple:
+                body[key].append(st)
+            elif type(st) is not list:
                 key = "else"
             else:
                 body[key].append(st[0])

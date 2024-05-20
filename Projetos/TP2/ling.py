@@ -258,12 +258,6 @@ p = Lark(grammarGraph) # cria um objeto parser
 tree = p.parse(exemple)  # retorna uma tree
 (structure, declarations, attributions, selections, cycle) = GraphInterpreter().visit(tree)
 
-print(declarations)
-print(attributions)
-print(selections)
-print(cycle)
-print(structure)
-
 print(create_cfg_graph(structure, declarations, attributions, selections, cycle))
 
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
