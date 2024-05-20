@@ -1,13 +1,14 @@
-list arr = [1,2,3,4,5,6,7]
-int target = 2
-int left = 0
-int right = 6
-int result = -1
+int n = 10
+int result = 0
+int i = 1
 
-while(left <= right){
-    int mid = (left + right)*2
-
-    if (arr[mid] == target){
-        result = mid
+while (i <= n){
+    if (n <= 0){
+        result = 0
+    } else if (n == 1){
+        result = 1
+    } else{
+        result = result + i
     }
+    i = i + 1
 }

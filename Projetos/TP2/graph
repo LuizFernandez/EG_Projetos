@@ -1,38 +1,44 @@
 digraph {
-	"list arr = ['1', '2', '3', '4', '5', '6', '7']"
+	"int n = 10"
 	inicio
-	inicio -> "list arr = ['1', '2', '3', '4', '5', '6', '7']"
-	"int target = 2"
-	"list arr = ['1', '2', '3', '4', '5', '6', '7']"
-	"list arr = ['1', '2', '3', '4', '5', '6', '7']" -> "int target = 2"
-	"int left = 0"
-	"int target = 2"
-	"int target = 2" -> "int left = 0"
-	"int right = 6"
-	"int left = 0"
-	"int left = 0" -> "int right = 6"
-	"int result = -1"
-	"int right = 6"
-	"int right = 6" -> "int result = -1"
-	"while (left <= right)"
-	"int result = -1"
-	"int result = -1" -> "while (left <= right)"
-	"while (left <= right)"
-	"while (left <= right)" -> "int mid = left + right * 2" [label=true]
-	"if (arr[mid] == target)"
-	"int mid = left + right * 2"
-	"int mid = left + right * 2" -> "if (arr[mid] == target)"
-	"if (arr[mid] == target)"
-	"if (arr[mid] == target)" -> "result = mid" [label=true]
-	"while (left <= right)"
-	"result = mid"
-	"result = mid" -> "while (left <= right)"
-	"if (arr[mid] == target)"
-	"if (arr[mid] == target)" -> "while (left <= right)" [label=false]
-	"while (left <= right)"
-	"while (left <= right)" -> fim [label=false]
-	"while (left <= right)" [shape=diamond]
-	"if (arr[mid] == target)" [shape=diamond]
-	"while (left <= right)" [shape=diamond]
-	"if (arr[mid] == target)" [shape=diamond]
+	inicio -> "int n = 10"
+	"int result = 0"
+	"int n = 10"
+	"int n = 10" -> "int result = 0"
+	"int i = 1"
+	"int result = 0"
+	"int result = 0" -> "int i = 1"
+	"while (i <= n)"
+	"int i = 1"
+	"int i = 1" -> "while (i <= n)"
+	"while (i <= n)"
+	"while (i <= n)" -> "if (n <= 0)" [label=true]
+	"if (n <= 0)"
+	"if (n <= 0)" -> "result = 0" [label=true]
+	"i = i + 1"
+	"result = 0"
+	"result = 0" -> "i = i + 1"
+	"if (n <= 0)"
+	"if (n <= 0)" -> "if (n == 1)" [label=false]
+	"if (n == 1)"
+	"if (n == 1)" -> "result = 1" [label=true]
+	"i = i + 1"
+	"result = 1"
+	"result = 1" -> "i = i + 1"
+	"if (n == 1)"
+	"if (n == 1)" -> "result = result + i" [label=false]
+	"i = i + 1"
+	"result = result + i"
+	"result = result + i" -> "i = i + 1"
+	"while (i <= n)"
+	"i = i + 1"
+	"i = i + 1" -> "while (i <= n)"
+	"while (i <= n)"
+	"while (i <= n)" -> fim [label=false]
+	"while (i <= n)" [shape=diamond]
+	"if (n <= 0)" [shape=diamond]
+	"if (n == 1)" [shape=diamond]
+	"while (i <= n)" [shape=diamond]
+	"if (n <= 0)" [shape=diamond]
+	"if (n == 1)" [shape=diamond]
 }
