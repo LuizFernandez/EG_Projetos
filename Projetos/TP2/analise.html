@@ -1,16 +1,12 @@
 <html><head><title>Analysis Result</title><style>body {font-family: Arial, sans-serif;}h2 {color: #333;}table {border-collapse: collapse; width: 100%; margin-top: 20px;}th, td {border: 1px solid #ddd; padding: 8px; text-align: left;}th {background-color: #4CAF50; color: white;}ul {list-style-type: none; padding: 0;}li {margin-bottom: 10px;}.error-table {background-color: #ffcccc;}</style></head><body><h2>Input Code</h2><pre><code>int z = 0
-z = 0
 
-while(z == 2){
-    z = 2
-    while(z == 3){
-        list l = [1,2,3,4]
+while (z<= 40){
+    if (z/2 >= 5){
+        z = z + 5
+    }
+    else{
+        z = z + 1
     }
 }
 
-while(z == 4){
-    z = 4
-}
-
-int z = 1
-</code></pre><h2>Variables and Types Used</h2><table border='1'><tr><th>Variable Name</th> <th>Type</th> <th>Value</th> <th>Used?</th></tr><tr><td>z</td> <td>int</td> <td>4</td> <td>True</td></tr><tr><td>l</td> <td>list</td> <td>[1, 2, 3, 4]</td> <td>False</td></tr></table></body><h2>Errors</h2><table border='1'><tr><th style='background-color: #8B0000; color: white;'>Variable</th> <th style='background-color: #8B0000; color: white;'>Type</th> <th style='background-color: #8B0000; color: white;'>Description</th></tr><tr><td>z</td> <td>Redeclaration</td> <td>variable is already declared</td></tr></table></body><h2>Number of Variables Declared per Type</h2><table border='1'><tr><th>Type</th> <th>Vars</th> <th>Number</th></tr><tr><td>int</td> <td>z</td> <td>1</td></tr><tr><td>list</td> <td>l</td> <td>1</td></tr></table></body><h2>Number of Instructions Found in the Code</h2><table border='1'><tr><th>Type</th> <th>Number</th></tr><tr><td>Attributions</td> <td>3</td></tr><tr><td>Declarations</td> <td>3</td></tr><tr><td>Selections</td> <td>3</td></tr><tr><td>Cycles</td> <td>0</td></tr></table></body><h2>Number of Control Structures Nested Within Other Control Structures</h2><ul><li><p style='font-size:24px;'>Found <b>1</b> nested control structures.</p></li></ul><h2>Nested 'If' Conditions That Can be Combined</h2><table border='1'><tr><th>Suggestion</th></tr></table></body><h2>CFG Graph of the code</h2><img src="graph.png" alt="Graph"></html>
+z = 1</code></pre><h2>Variables and Types Used</h2><table border='1'><tr><th>Variable Name</th> <th>Type</th> <th>Value</th> <th>Used?</th></tr><tr><td>z</td> <td>int</td> <td>1</td> <td>True</td></tr></table></body><h2>Errors</h2><table border='1'><tr><th style='background-color: #8B0000; color: white;'>Variable</th> <th style='background-color: #8B0000; color: white;'>Type</th> <th style='background-color: #8B0000; color: white;'>Description</th></tr></table></body><h2>Number of Variables Declared per Type</h2><table border='1'><tr><th>Type</th> <th>Vars</th> <th>Number</th></tr><tr><td>int</td> <td>z</td> <td>1</td></tr></table></body><h2>Number of Instructions Found in the Code</h2><table border='1'><tr><th>Type</th> <th>Number</th></tr><tr><td>Attributions</td> <td>3</td></tr><tr><td>Declarations</td> <td>1</td></tr><tr><td>Selections</td> <td>2</td></tr><tr><td>Cycles</td> <td>0</td></tr></table></body><h2>Number of Control Structures Nested Within Other Control Structures</h2><ul><li><p style='font-size:24px;'>Found <b>1</b> nested control structures.</p></li></ul><h2>Nested 'If' Conditions That Can be Combined</h2><table border='1'><tr><th>Suggestion</th></tr></table></body><h2>CFG Graph of the code</h2><img src="graph.png" alt="Graph"></html>
