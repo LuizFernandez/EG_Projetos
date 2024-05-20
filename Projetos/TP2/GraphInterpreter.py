@@ -1,25 +1,34 @@
 from lark.visitors import Interpreter
+from icecream import ic
 
 from script import get_type, validate_error, count_Control
 
 class GraphInterpreter(Interpreter):
     def __init__(self):
-        self.structure = {0 : "inicio"}
-        self.node = 0
-        self.depth = 0
+        self.structure = { "statments": {}, "occor": 0}
+        self.selections = { "statments": {}, "occor": 0}
+        self.cycle = { "statments": {}, "occor": 0}
+        self.declarations = { "statments": {}, "occor": 0}
+        self.attributions = { "statments": {}, "occor": 0}
 
     def start(self, tree):
         r = self.visit_children(tree)
-        self.structure[self.node + 1] = "fim"
-        return self.structure
+        for pos in range(0, len(r)):
+            self.structure["statments"][pos] = r[pos]
+        
+        self.structure["occor"] = len(r)
+
+        return (self.structure, self.declarations, self.attributions, self.selections, self.cycle)
     
     def statments(self, tree): 
         r = self.visit_children(tree)
         return r
 
     def declaration(self, tree):
-        result = ""
         r = self.visit_children(tree)
+
+        n = self.declarations["occor"]
+        self.declarations["occor"] += 1
 
         result = r[0][0] + " " + r[1]
         if len(r) > 2:
@@ -30,16 +39,15 @@ class GraphInterpreter(Interpreter):
             else:
                 result += r[2]
                 
-        if self.depth == 0:
-            self.node += 1
-            self.structure[self.node] = result
+        self.declarations["statments"][n] = result
             
-        #print(result)
-        return result
+        return ("declaration", n)
     
     def attribution(self, tree):
-        result = ""
         r = self.visit_children(tree)
+
+        n = self.attributions["occor"]
+        self.attributions["occor"] += 1
 
         result = r[0][0] + " = "
         if type(r[1]) is list:
@@ -48,11 +56,9 @@ class GraphInterpreter(Interpreter):
         else:
             result += r[1]
 
-        if self.depth == 0:
-            self.node += 1
-            self.structure[self.node] = result
+        self.attributions["statments"][n] = result
         
-        return result
+        return ("attribution", n)
 
     def primitive_type(self, tree):
         r = self.visit_children(tree)
@@ -207,19 +213,65 @@ class GraphInterpreter(Interpreter):
         r = self.visit_children(tree)
         return f"{r[0][0]}^{r[2][0]}"
 
-    def selection(self, tree):
-        if self.depth == 0:
-            self.node += 1
-        self.depth += 1
+    def selection_ifs(self, tree):
+        n = self.selections["occor"]
+        self.selections["occor"] += 1
 
-        self.structure[self.node] = []
         r = self.visit_children(tree)
-        self.structure[self.node].append(f"if({r[1][0]})")
-        for elem in r[2:]:
-            if isinstance(elem, list):
-                self.structure[self.node].append(elem[0])
-            else:
-                self.structure[self.node].append(str(elem))
+        content = {}
 
-        self.depth -= 1
-        return "IGNORE"
+        condiction = r[1][0]
+        content["condition"] = f"if ({condiction})"
+
+        body = []
+        for st in r[2:]:
+            body.append(st[0])
+        content["body"] = body
+
+        self.selections["statments"][n] = content
+        
+        return ("ifs", n)
+    
+    def selection_ifelses(self, tree):
+        n = self.selections["occor"]
+        self.selections["occor"] += 1
+
+        r = self.visit_children(tree)
+        content = {}
+
+        condiction = r[1][0]
+        content["condition"] = f"if ({condiction})"
+
+        body = {"if": [], "else": []}
+        key = "if"
+        for st in r[2:]:
+            if key == "else" and type(st) is tuple:
+                body[key].append(st)
+            elif type(st) is not list:
+                key = "else"
+            else:
+                body[key].append(st[0])
+        content["body"] = body
+
+        self.selections["statments"][n] = content
+        
+        return ("ifelses", n)
+    
+    def cycle_while(self, tree):
+        n = self.cycle["occor"]
+        self.cycle["occor"] += 1
+
+        r = self.visit_children(tree)
+        content = {}
+
+        condiction = r[1][0]
+        content["condition"] = f"while ({condiction})"
+
+        body = []
+        for st in r[2:]:
+            body.append(st[0])
+        content["body"] = body
+
+        self.cycle["statments"][n] = content
+
+        return ("while", n)

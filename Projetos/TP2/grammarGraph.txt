@@ -45,10 +45,10 @@ tuple_construct : LPAR RPAR
 array_construct : "array(" INT ")"
 				| "array(" ID ")" # ID é uma vairável do tipo lista, set ou tuple
 
-selection : IF "(" value ")" "{" statments* ( "break" | "return" value )? "}"
-		  | IF "(" value ")" "{" statments* "}" ELSE ( "{" statments* "}" | selection )
+selection : IF "(" value ")" "{" statments* ( "break" | "return" value )? "}" -> selection_ifs
+		  | IF "(" value ")" "{" statments* "}" ELSE ( "{" statments* "}" | selection ) -> selection_ifelses
 
-cycle : WHILE "(" value ")" "{" statments* "}"
+cycle : WHILE "(" value ")" "{" statments* "}" -> cycle_while
 	  | DO "{" statments* "}" "while" "(" value ")"
 	  | FOR ID "in" ( value ) "{" statments* "}"
 

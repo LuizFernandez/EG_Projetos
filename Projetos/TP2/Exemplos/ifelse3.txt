@@ -13,4 +13,8 @@ else{
     list b = []
 }
 
-z = 6
+if(z == 1){
+    b = 1
+}else{
+    a = 1
+}

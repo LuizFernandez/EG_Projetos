@@ -1,44 +1,88 @@
 digraph {
-	"int z = 1"
+	"int z = 0"
 	inicio
-	inicio -> "int z = 1"
-	"if(z == 20)"
-	"int z = 1"
-	"int z = 1" -> "if(z == 20)"
-	"if(z == 20)"
-	"if(z == 20)" -> "z = 3" [label=true]
-	"z = 4"
+	inicio -> "int z = 0"
+	"z = 1"
+	"int z = 0"
+	"int z = 0" -> "z = 1"
+	"if (z == 2)"
+	"z = 1"
+	"z = 1" -> "if (z == 2)"
+	"if (z == 2)"
+	"if (z == 2)" -> "z = 3" [label=true]
+	"if (z == 4)"
 	"z = 3"
-	"z = 3" -> "z = 4"
-	"z = 20"
-	"z = 4"
-	"z = 4" -> "z = 20"
-	"if(z == 20)"
-	"if(z == 20)" -> "if(z == 3)" [label=false]
-	"if(z == 3)"
-	"if(z == 3)" -> "z = 6" [label=true]
-	"z = 20"
+	"z = 3" -> "if (z == 4)"
+	"if (z == 4)"
+	"if (z == 4)" -> "z = 5" [label=true]
+	"while (z == 7)"
+	"z = 5"
+	"z = 5" -> "while (z == 7)"
+	"if (z == 4)"
+	"if (z == 4)" -> "z = 6" [label=false]
+	"while (z == 7)"
 	"z = 6"
-	"z = 6" -> "z = 20"
-	"if(z == 3)"
-	"if(z == 3)" -> "if(z == 4)" [label=false]
-	"if(z == 4)"
-	"if(z == 4)" -> "z = 8" [label=true]
-	"z = 20"
+	"z = 6" -> "while (z == 7)"
+	"while (z == 7)"
+	"while (z == 7)" -> "z = 8" [label=true]
+	"if (z == 9)"
 	"z = 8"
-	"z = 8" -> "z = 20"
-	"if(z == 4)"
-	"if(z == 4)" -> "z = 9" [label=false]
+	"z = 8" -> "if (z == 9)"
+	"if (z == 9)"
+	"if (z == 9)" -> "z = 10" [label=true]
+	"z = 11"
 	"z = 10"
-	"z = 9"
-	"z = 9" -> "z = 10"
-	"z = 20"
-	"z = 10"
-	"z = 10" -> "z = 20"
+	"z = 10" -> "z = 11"
+	"if (z == 9)"
+	"if (z == 9)" -> "z = 11" [label=false]
+	"while (z == 7)"
+	"z = 11"
+	"z = 11" -> "while (z == 7)"
+	"while (z == 7)"
+	"while (z == 7)" -> "while (z == 12)" [label=false]
+	"if (z == 2)"
+	"if (z == 2)" -> "while (z == 12)" [label=false]
+	"while (z == 12)"
+	"while (z == 12)" -> "while (z == 13)" [label=true]
+	"while (z == 13)"
+	"while (z == 13)" -> "while (z == 14)" [label=true]
+	"while (z == 14)"
+	"while (z == 14)" -> "if (z == 15)" [label=true]
+	"z = 17"
+	"if (z == 15)"
+	"if (z == 15)" -> "z = 17"
+	"while (z == 14)"
+	"z = 17"
+	"z = 17" -> "while (z == 14)"
+	"while (z == 14)"
+	"while (z == 14)" -> "z = 18" [label=false]
+	"while (z == 13)"
+	"z = 18"
+	"z = 18" -> "while (z == 13)"
+	"while (z == 13)"
+	"while (z == 13)" -> "if (z == 19)" [label=false]
+	"z = 21"
+	"if (z == 19)"
+	"if (z == 19)" -> "z = 21"
 	fim
-	"z = 20"
-	"z = 20" -> fim
-	"if(z == 4)" [shape=diamond]
-	"if(z == 3)" [shape=diamond]
-	"if(z == 20)" [shape=diamond]
+	"z = 21"
+	"z = 21" -> fim
+	"if (z == 2)" [shape=diamond]
+	"if (z == 4)" [shape=diamond]
+	"while (z == 7)" [shape=diamond]
+	"if (z == 9)" [shape=diamond]
+	"while (z == 12)" [shape=diamond]
+	"while (z == 13)" [shape=diamond]
+	"while (z == 14)" [shape=diamond]
+	"if (z == 15)" [shape=diamond]
+	"if (z == 19)" [shape=diamond]
+	"if (z == 2)" [shape=diamond]
+	"if (z == 4)" [shape=diamond]
+	"while (z == 7)" [shape=diamond]
+	"if (z == 9)" [shape=diamond]
+	"while (z == 12)" [shape=diamond]
+	"while (z == 13)" [shape=diamond]
+	"while (z == 14)" [shape=diamond]
+	"if (z == 15)" [shape=diamond]
+	"if (z == 19)" [shape=diamond]
 }

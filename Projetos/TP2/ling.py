@@ -249,7 +249,7 @@ with open("grammar.txt","r") as file:
 with open("grammarGraph.txt","r") as file:
     grammarGraph = file.read()
 
-with open("./Exemplos/ifelse2.txt") as file:
+with open("./Exemplos/behold.txt") as file:
     exemple = file.read()
 
 p = Lark(grammar) # cria um objeto parser
@@ -260,12 +260,11 @@ tree = p.parse(exemple)  # retorna uma tree
 p = Lark(grammarGraph) # cria um objeto parser
 
 tree = p.parse(exemple)  # retorna uma tree
-structure = GraphInterpreter().visit(tree)
+(structure, declarations, attributions, selections, cycle) = GraphInterpreter().visit(tree)
 
-print(structure)
-print(create_cfg_graph(structure))
+print(create_cfg_graph(structure, declarations, attributions, selections, cycle))
 
 #print("Quantidade de situações em que estruturas de controlo surgem aninhadas em outras estruturas de controlo do mesmo ou de tipos diferentes:", nesting)
 #print("Lista de ifs aninhados que podem ser substituídos por um só if", sub_ifs)
 
-buildHTML(exemple,data,erros,count,types,nesting,sub_ifs,create_cfg_graph(structure))
+buildHTML(data,erros,count,types,nesting,sub_ifs,create_cfg_graph(structure, declarations, attributions, selections, cycle))

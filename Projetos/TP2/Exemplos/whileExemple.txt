@@ -1,0 +1,22 @@
+
+
+int x = 0
+
+while (x < 10){
+    x = x + 1
+    int y = 0
+    while(y != 5){
+        y = y + 1
+        if(x != y){
+            float f = 3.4
+            if(f < 10){
+                string r = "Hello World"
+            }
+        }
+    }
+}
+
+
+while(True){
+    string l = "Hello"
+}
