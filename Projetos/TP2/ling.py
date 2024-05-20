@@ -161,7 +161,7 @@ def buildSubIf(sub_ifs):
 def buildCFG(structure):
     # Define the graph
     graph = graphviz.Digraph(format='png')
-    pattern = r'("[^"]+")\s+\[(\w+)=\"?(\w+)\"?\]'
+    pattern = r'("[^"]*(?:"[^"]*")*")\s+\[(\w+)=\"?(\w+)\"?\]'
     label = ''
 
     # Parse the graph data and add nodes and edges
