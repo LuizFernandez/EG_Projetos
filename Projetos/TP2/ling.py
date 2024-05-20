@@ -213,7 +213,7 @@ def buildCFG(structure):
 
     return html_content
 
-def buildHTML(data,erros,count,types,nesting,sub_ifs,structure):
+def buildHTML(exemple, data, erros, count, types, nesting, sub_ifs, structure):
     html_content = "<html><head><title>Analysis Result</title><style>"
     html_content += "body {font-family: Arial, sans-serif;}"
     html_content += "h2 {color: #333;}"
@@ -224,6 +224,10 @@ def buildHTML(data,erros,count,types,nesting,sub_ifs,structure):
     html_content += "li {margin-bottom: 10px;}"
     html_content += ".error-table {background-color: #ffcccc;}"
     html_content += "</style></head><body>"
+    html_content += "<h2>Input Code</h2>"
+    html_content += "<pre><code>"
+    html_content += exemple
+    html_content += "</code></pre>"
     html_content += buildVariaveis(data)
     html_content += buildErros(erros)
     html_content += buildTipos(types)
