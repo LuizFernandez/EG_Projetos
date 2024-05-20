@@ -1,29 +1,38 @@
 digraph {
-	"int z = 0"
+	"list arr = ['1', '2', '3', '4', '5', '6', '7']"
 	inicio
-	inicio -> "int z = 0"
-	"while (z <= 40)"
-	"int z = 0"
-	"int z = 0" -> "while (z <= 40)"
-	"while (z <= 40)"
-	"while (z <= 40)" -> "if (z / 2 >= 5)" [label=true]
-	"if (z / 2 >= 5)"
-	"if (z / 2 >= 5)" -> "z = z + 5" [label=true]
-	"while (z <= 40)"
-	"z = z + 5"
-	"z = z + 5" -> "while (z <= 40)"
-	"if (z / 2 >= 5)"
-	"if (z / 2 >= 5)" -> "z = z + 1" [label=false]
-	"while (z <= 40)"
-	"z = z + 1"
-	"z = z + 1" -> "while (z <= 40)"
-	"while (z <= 40)"
-	"while (z <= 40)" -> "z = 1" [label=false]
-	fim
-	"z = 1"
-	"z = 1" -> fim
-	"while (z <= 40)" [shape=diamond]
-	"if (z / 2 >= 5)" [shape=diamond]
-	"while (z <= 40)" [shape=diamond]
-	"if (z / 2 >= 5)" [shape=diamond]
+	inicio -> "list arr = ['1', '2', '3', '4', '5', '6', '7']"
+	"int target = 2"
+	"list arr = ['1', '2', '3', '4', '5', '6', '7']"
+	"list arr = ['1', '2', '3', '4', '5', '6', '7']" -> "int target = 2"
+	"int left = 0"
+	"int target = 2"
+	"int target = 2" -> "int left = 0"
+	"int right = 6"
+	"int left = 0"
+	"int left = 0" -> "int right = 6"
+	"int result = -1"
+	"int right = 6"
+	"int right = 6" -> "int result = -1"
+	"while (left <= right)"
+	"int result = -1"
+	"int result = -1" -> "while (left <= right)"
+	"while (left <= right)"
+	"while (left <= right)" -> "int mid = left + right % 2" [label=true]
+	"if (arr[mid] == target)"
+	"int mid = left + right % 2"
+	"int mid = left + right % 2" -> "if (arr[mid] == target)"
+	"if (arr[mid] == target)"
+	"if (arr[mid] == target)" -> "r = mid" [label=true]
+	"while (left <= right)"
+	"r = mid"
+	"r = mid" -> "while (left <= right)"
+	"if (arr[mid] == target)"
+	"if (arr[mid] == target)" -> "while (left <= right)" [label=false]
+	"while (left <= right)"
+	"while (left <= right)" -> fim [label=false]
+	"while (left <= right)" [shape=diamond]
+	"if (arr[mid] == target)" [shape=diamond]
+	"while (left <= right)" [shape=diamond]
+	"if (arr[mid] == target)" [shape=diamond]
 }

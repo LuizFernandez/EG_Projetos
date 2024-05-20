@@ -1,3 +1,4 @@
 | Type | Vars | Number |
 |------|------|--------|
-int|z|1
+list|arr|1
+int|target, left, right, result, mid|5

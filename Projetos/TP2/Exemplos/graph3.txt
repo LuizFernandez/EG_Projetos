@@ -1,0 +1,13 @@
+list arr = [1,2,3,4,5,6,7]
+int target = 2
+int left = 0
+int right = 6
+int result = -1
+
+while(left <= right){
+    int mid = (left + right)%2
+
+    if (arr[mid] == target){
+        result = mid
+    }
+}
