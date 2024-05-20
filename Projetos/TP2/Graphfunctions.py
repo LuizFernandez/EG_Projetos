@@ -2,7 +2,7 @@ from collections import defaultdict
 
 conditions = []
 
-def next(tuple, declarations, attributions, selections, cycle):
+def true_value(tuple, declarations, attributions, selections, cycle):
 
     match (tuple[0]):
         case "declaration":
@@ -28,11 +28,11 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
             body = selections["statments"][tuple[1]]["body"]
             if len(body) > 0:
                 ant = body[0]
-                value = next(ant, declarations, attributions, selections, cycle)
+                value = true_value(ant, declarations, attributions, selections, cycle)
                 graph += f'"{condition}" -> "{value}" [label="true"]\n'
                 if len(body) > 1:
                     for elem in body[1:]:
-                        elem_value = next(elem, declarations, attributions, selections, cycle) 
+                        elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                         match (ant[0]):
                             case "declaration" | "attribution" :
                                 graph += f'"{value}" -> "{elem_value}"\n'
@@ -42,7 +42,7 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
                         value = elem_value
                     match (body[-1][0]):
                         case "declaration" | "attribution" :
-                            graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                            graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
                             graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
                         case "ifs" | "ifelses" | "while":
                             graph += nesting(body[-1], next_value, declarations, attributions, selections, cycle)
@@ -66,11 +66,11 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
             if len(if_list) > 0 and len(else_list) > 0:
                 if len(if_list) > 0:
                     ant = if_list[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(if_list) > 1:
                         for elem in if_list[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -80,7 +80,7 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
                             value = elem_value
                         match (if_list[-1][0]):
                             case "declaration" | "attribution" :
-                                graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                                graph += f'"{true_value(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
                             case "ifs" | "ifelses" | "while":
                                 graph += nesting(if_list[-1], next_value, declarations, attributions, selections, cycle)
                     else:
@@ -94,11 +94,11 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
 
                 if len(else_list) > 0:
                     ant = else_list[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="false"]\n'
                     if len(else_list) > 1:
                         for elem in else_list[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -108,7 +108,7 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
                             value = elem_value
                         match (else_list[-1][0]):
                             case "declaration" | "attribution" :
-                                graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
+                                graph += f'"{true_value(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next_value}"\n'
                             case "ifs" | "ifelses" | "while":
                                 graph += nesting(else_list[-1], next_value, declarations, attributions, selections, cycle)
                     else:
@@ -128,11 +128,11 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
             body = cycle["statments"][tuple[1]]["body"]
             if len(body) > 0:
                 ant = body[0]
-                value = next(ant, declarations, attributions, selections, cycle)
+                value = true_value(ant, declarations, attributions, selections, cycle)
                 graph += f'"{condition}" -> "{value}" [label="true"]\n'
                 if len(body) > 1:
                     for elem in body[1:]:
-                        elem_value = next(elem, declarations, attributions, selections, cycle) 
+                        elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                         match (ant[0]):
                             case "declaration" | "attribution" :
                                 graph += f'"{value}" -> "{elem_value}"\n'
@@ -142,7 +142,7 @@ def nesting(tuple, next_value, declarations, attributions, selections, cycle):
                         value = elem_value
                     match (body[-1][0]):
                         case "declaration" | "attribution" :
-                            graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                            graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
                             graph += f'"{condition}" -> "{next_value}" [label="false"]\n'
                         case "ifs" | "ifelses" | "while":
                             graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
@@ -168,17 +168,17 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
         statment = structure["statments"][0][0]
         match (statment[0]):
             case "declaration":
-                value = next(statment, declarations, attributions, selections, cycle)
+                value = true_value(statment, declarations, attributions, selections, cycle)
                 graph += f'"inicio" -> "{value}"\n'
                 if structure["occor"] > 1:
-                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                    graph += f'"{value}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                 else:
                     graph += f'"{value}" -> "fim"\n'
             case "attribution":
-                value = next(statment, declarations, attributions, selections, cycle)
+                value = true_value(statment, declarations, attributions, selections, cycle)
                 graph += f'"inicio" -> "{value}"\n'
                 if structure["occor"] > 1:
-                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                    graph += f'"{value}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                 else:
                     graph += f'"{value}" -> "fim"\n'
             case "ifs":
@@ -189,11 +189,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
 
                 if len(body) > 0:
                     ant = body[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(body) > 1:
                         for elem in body[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -204,15 +204,15 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (body[-1][0]):
                             case "declaration" | "attribution" :
                                 if structure["occor"] > 1:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
                                 if structure["occor"] > 1:
-                                    graph += nesting(body[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += nesting(body[-1], true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += nesting(body[-1], "fim", declarations, attributions, selections, cycle)
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
@@ -221,21 +221,21 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (ant[0]):
                             case "declaration" | "attribution" :  
                                 if structure["occor"] > 1:
-                                    graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{value}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{value}" -> "fim"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
 
                                 if structure["occor"] > 1:
-                                    graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += nesting(ant, true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                 else:
                                     graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                 else:
                     if structure["occor"] > 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
 
@@ -251,11 +251,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                     #--------------------------Caso de if----------------------------------
                     if len(if_list) > 0:
                         ant = if_list[0]
-                        value = next(ant, declarations, attributions, selections, cycle)
+                        value = true_value(ant, declarations, attributions, selections, cycle)
                         graph += f'"{condition}" -> "{value}" [label="true"]\n'
                         if len(if_list) > 1:
                             for elem in if_list[1:]:
-                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                                 match (ant[0]):
                                     case "declaration" | "attribution" :
                                         graph += f'"{value}" -> "{elem_value}"\n'
@@ -266,42 +266,42 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (if_list[-1][0]):
                                 case "declaration" | "attribution" :
                                     if structure["occor"] > 1:
-                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{true_value(if_list[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
-                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                        graph += f'"{true_value(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
                                     if structure["occor"] > 1:
-                                        graph += nesting(if_list[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(if_list[-1], true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(if_list[-1], "fim", declarations, attributions, selections, cycle)
                         else:
                             match (ant[0]):
                                 case "declaration" | "attribution" :  
                                     if structure["occor"] > 1:
-                                        graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{value}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
                                         graph += f'"{value}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
 
                                     if structure["occor"] > 1:
-                                        graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(ant, true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                     else:
                         if structure["occor"] > 1:
-                            graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
+                            graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
                         else:
                             graph += f'"{condition}" -> "fim" [label="true"]\n'
                     
                     #--------------------------Caso de else----------------------------------
                     if len(else_list) > 0:
                         ant = else_list[0]
-                        value = next(ant, declarations, attributions, selections, cycle)
+                        value = true_value(ant, declarations, attributions, selections, cycle)
                         graph += f'"{condition}" -> "{value}" [label="false"]\n'
                         if len(else_list) > 1:
                             for elem in else_list[1:]:
-                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                                 match (ant[0]):
                                     case "declaration" | "attribution" :
                                         graph += f'"{value}" -> "{elem_value}"\n'
@@ -312,12 +312,12 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (else_list[-1][0]):
                                 case "declaration" | "attribution" :
                                     if structure["occor"] > 1:
-                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{true_value(else_list[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
-                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                        graph += f'"{true_value(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
                                     if structure["occor"] > 1:
-                                        graph += nesting(else_list[-1], next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(else_list[-1], true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(else_list[-1], "fim", declarations, attributions, selections, cycle)
                         
@@ -325,24 +325,24 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (ant[0]):
                                 case "declaration" | "attribution" :  
                                     if structure["occor"] > 1:
-                                        graph += f'"{value}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{value}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
                                         graph += f'"{value}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
 
                                     if structure["occor"] > 1:
-                                        graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(ant, true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                     else:
                         if structure["occor"] > 1:
-                            graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                            graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                         else:
                             graph += f'"{condition}" -> "fim" [label="false"]\n'
                 else:
                     if structure["occor"] > 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
 
@@ -355,11 +355,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
 
                 if len(body) > 0:
                     ant = body[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(body) > 1:
                         for elem in body[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -370,15 +370,15 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (body[-1][0]):
                             case "declaration" | "attribution" :
                                 if structure["occor"] > 1:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{condition}" -> "{condition}"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
                                 if structure["occor"] > 1:
                                     graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
@@ -387,20 +387,20 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             case "declaration" | "attribution" :  
                                 if len(structure) > 1:
                                     graph += f'"{value}" -> "{condition}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{value}" -> "{condition}"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
 
                                 if structure["occor"] > 1:
-                                    graph += nesting(ant, next(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += nesting(ant, true_value(structure["statments"][1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                 else:
                                     graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                 else:
                     if structure["occor"] > 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
     else:
@@ -413,15 +413,15 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
 
         match (statment[0][0]):
             case "declaration":
-                value = next(statment[0], declarations, attributions, selections, cycle)
+                value = true_value(statment[0], declarations, attributions, selections, cycle)
                 if structure["occor"] != node_id + 1:
-                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                    graph += f'"{value}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                 else:
                     graph += f'"{value}" -> "fim"\n'
             case "attribution":
-                value = next(statment[0], declarations, attributions, selections, cycle)
+                value = true_value(statment[0], declarations, attributions, selections, cycle)
                 if structure["occor"] != node_id + 1:
-                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                    graph += f'"{value}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                 else:
                     graph += f'"{value}" -> "fim"\n'
             case "ifs":
@@ -431,11 +431,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
 
                 if len(body) > 0:
                     ant = body[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(body) > 1:
                         for elem in body[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -446,15 +446,15 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (body[-1][0]):
                             case "declaration" | "attribution" :
                                 if structure["occor"] != node_id + 1:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
                                 if structure["occor"] != node_id + 1:
-                                    graph += nesting(body[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += nesting(body[-1], true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += nesting(body[-1], "fim", declarations, attributions, selections, cycle)
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
@@ -463,21 +463,21 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (ant[0]):
                             case "declaration" | "attribution" :  
                                 if structure["occor"] != node_id + 1:
-                                    graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{value}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{value}" -> "fim"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
 
                                 if structure["occor"] != node_id + 1:
-                                    graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += nesting(ant, true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                 else:
                                     graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                 else:
                     if structure["occor"] != node_id + 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
 
@@ -492,11 +492,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                     #--------------------------Caso de if----------------------------------
                     if len(if_list) > 0:
                         ant = if_list[0]
-                        value = next(ant, declarations, attributions, selections, cycle)
+                        value = true_value(ant, declarations, attributions, selections, cycle)
                         graph += f'"{condition}" -> "{value}" [label="true"]\n'
                         if len(if_list) > 1:
                             for elem in if_list[1:]:
-                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                                 match (ant[0]):
                                     case "declaration" | "attribution" :
                                         graph += f'"{value}" -> "{elem_value}"\n'
@@ -507,42 +507,42 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (if_list[-1][0]):
                                 case "declaration" | "attribution" :
                                     if structure["occor"] != node_id + 1:
-                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{true_value(if_list[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
-                                        graph += f'"{next(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                        graph += f'"{true_value(if_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
                                     if structure["occor"] != node_id + 1:
-                                        graph += nesting(if_list[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(if_list[-1], true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(if_list[-1], "fim", declarations, attributions, selections, cycle)
                         else:
                             match (ant[0]):
                                 case "declaration" | "attribution" :  
                                     if structure["occor"] != node_id + 1:
-                                        graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{value}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
                                         graph += f'"{value}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
 
                                     if structure["occor"] != node_id + 1:
-                                        graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(ant, true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                     else:
                         if structure["occor"] != node_id + 1:
-                            graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
+                            graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="true"]\n'
                         else:
                             graph += f'"{condition}" -> "fim" [label="true"]\n'
                     
                     #--------------------------Caso de else----------------------------------
                     if len(else_list) > 0:
                         ant = else_list[0]
-                        value = next(ant, declarations, attributions, selections, cycle)
+                        value = true_value(ant, declarations, attributions, selections, cycle)
                         graph += f'"{condition}" -> "{value}" [label="false"]\n'
                         if len(else_list) > 1:
                             for elem in else_list[1:]:
-                                elem_value = next(elem, declarations, attributions, selections, cycle) 
+                                elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                                 match (ant[0]):
                                     case "declaration" | "attribution" :
                                         graph += f'"{value}" -> "{elem_value}"\n'
@@ -553,12 +553,12 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (else_list[-1][0]):
                                 case "declaration" | "attribution" :
                                     if structure["occor"] != node_id + 1:
-                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{true_value(else_list[-1], declarations, attributions, selections, cycle)}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
-                                        graph += f'"{next(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
+                                        graph += f'"{true_value(else_list[-1], declarations, attributions, selections, cycle)}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
                                     if structure["occor"] != node_id + 1:
-                                        graph += nesting(else_list[-1], next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(else_list[-1], true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(else_list[-1], "fim", declarations, attributions, selections, cycle)
                         
@@ -566,24 +566,24 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             match (ant[0]):
                                 case "declaration" | "attribution" :  
                                     if structure["occor"] != node_id + 1:
-                                        graph += f'"{value}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                                        graph += f'"{value}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                                     else:
                                         graph += f'"{value}" -> "fim"\n'
                                 case "ifs" | "ifelses" | "while":
 
                                     if structure["occor"] != node_id + 1:
-                                        graph += nesting(ant, next(structure["statments"][node_id +1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                        graph += nesting(ant, true_value(structure["statments"][node_id +1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                     else:
                                         graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                     else:
                         if structure["occor"] != node_id + 1:
-                            graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                            graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                         else:
                             graph += f'"{condition}" -> "fim" [label="false"]\n'
                 else:
                     if structure["occor"] != node_id + 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
 
@@ -595,11 +595,11 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
 
                 if len(body) > 0:
                     ant = body[0]
-                    value = next(ant, declarations, attributions, selections, cycle)
+                    value = true_value(ant, declarations, attributions, selections, cycle)
                     graph += f'"{condition}" -> "{value}" [label="true"]\n'
                     if len(body) > 1:
                         for elem in body[1:]:
-                            elem_value = next(elem, declarations, attributions, selections, cycle) 
+                            elem_value = true_value(elem, declarations, attributions, selections, cycle) 
                             match (ant[0]):
                                 case "declaration" | "attribution" :
                                     graph += f'"{value}" -> "{elem_value}"\n'
@@ -610,15 +610,15 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                         match (body[-1][0]):
                             case "declaration" | "attribution" :
                                 if structure["occor"] != node_id + 1:
-                                    graph += f'"{next(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{true_value(body[-1], declarations, attributions, selections, cycle)}" -> "{condition}"\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{condition}" -> "{condition}"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
                                 if structure["occor"] != node_id + 1:
                                     graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += nesting(body[-1], condition, declarations, attributions, selections, cycle)
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
@@ -627,19 +627,19 @@ def create_cfg_graph(structure, declarations, attributions, selections, cycle):
                             case "declaration" | "attribution" :  
                                 if structure["occor"] != node_id + 1:
                                     graph += f'"{value}" -> "{condition}"\n'
-                                    graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
+                                    graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}" [label="false"]\n'
                                 else:
                                     graph += f'"{value}" -> "{condition}"\n'
                                     graph += f'"{condition}" -> "fim" [label="false"]\n'
                             case "ifs" | "ifelses" | "while":
                                 if structure["occor"] != node_id + 1:
-                                    graph += nesting(ant, next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
+                                    graph += nesting(ant, true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle), declarations, attributions, selections, cycle)
                                 else:
                                     graph += nesting(ant, "fim", declarations, attributions, selections, cycle)
 
                 else:
                     if structure["occor"] != node_id + 1:
-                        graph += f'"{condition}" -> "{next(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
+                        graph += f'"{condition}" -> "{true_value(structure["statments"][node_id + 1][0], declarations, attributions, selections, cycle)}"\n'
                     else:
                         graph += f'"{condition}" -> "fim"\n'
 
