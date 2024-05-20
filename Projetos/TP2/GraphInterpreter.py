@@ -88,6 +88,10 @@ class GraphInterpreter(Interpreter):
         r = self.visit_children(tree)
         return str(r[0])
     
+    def complex_value(self, tree):
+        r = self.visit_children(tree)
+        return r[0]
+    
     def list_construct(self, tree):
         r = self.visit_children(tree)
         value = None
@@ -103,7 +107,6 @@ class GraphInterpreter(Interpreter):
         else:
             variable = str(r[0])    
             value = f"list({variable})"
-
         return value
             
     def set_construct(self, tree):

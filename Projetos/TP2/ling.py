@@ -249,7 +249,7 @@ with open("grammar.txt","r") as file:
 with open("grammarGraph.txt","r") as file:
     grammarGraph = file.read()
 
-with open("./Exemplos/graph2.txt") as file:
+with open("./Exemplos/while.txt") as file:
     exemple = file.read()
 
 p = Lark(grammar) # cria um objeto parser
