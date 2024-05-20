@@ -4,5 +4,5 @@
 |target|int|2|True|
 |left|int|0|True|
 |right|int|6|True|
-|result|int|0|False|
-|mid|int|0|True|
+|result|int|12|False|
+|mid|int|12|True|

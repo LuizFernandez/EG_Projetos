@@ -49,7 +49,7 @@ class GraphInterpreter(Interpreter):
         n = self.attributions["occor"]
         self.attributions["occor"] += 1
 
-        result = r[0][0] + " = "
+        result = r[0] + " = "
         if type(r[1]) is list:
             for elem in r[1]:
                 result += elem 

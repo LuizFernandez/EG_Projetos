@@ -18,15 +18,15 @@ digraph {
 	"int result = -1"
 	"int result = -1" -> "while (left <= right)"
 	"while (left <= right)"
-	"while (left <= right)" -> "int mid = left + right % 2" [label=true]
+	"while (left <= right)" -> "int mid = left + right * 2" [label=true]
 	"if (arr[mid] == target)"
-	"int mid = left + right % 2"
-	"int mid = left + right % 2" -> "if (arr[mid] == target)"
+	"int mid = left + right * 2"
+	"int mid = left + right * 2" -> "if (arr[mid] == target)"
 	"if (arr[mid] == target)"
-	"if (arr[mid] == target)" -> "r = mid" [label=true]
+	"if (arr[mid] == target)" -> "result = mid" [label=true]
 	"while (left <= right)"
-	"r = mid"
-	"r = mid" -> "while (left <= right)"
+	"result = mid"
+	"result = mid" -> "while (left <= right)"
 	"if (arr[mid] == target)"
 	"if (arr[mid] == target)" -> "while (left <= right)" [label=false]
 	"while (left <= right)"

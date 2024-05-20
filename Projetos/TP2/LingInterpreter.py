@@ -1,4 +1,5 @@
 from lark.visitors import Interpreter
+from icecream import ic
 
 from script import get_type, validate_error, count_Control
 

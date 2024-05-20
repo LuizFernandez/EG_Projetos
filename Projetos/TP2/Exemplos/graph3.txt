@@ -5,7 +5,7 @@ int right = 6
 int result = -1
 
 while(left <= right){
-    int mid = (left + right)%2
+    int mid = (left + right)*2
 
     if (arr[mid] == target){
         result = mid
